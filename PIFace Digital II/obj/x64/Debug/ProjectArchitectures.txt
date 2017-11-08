@@ -1,0 +1,2 @@
+C:\Users\Zipfeldieb\Desktop\PIFace Digital II - Kopie\MCP23S17\MCP23S17.csproj;x64
+C:\Users\Zipfeldieb\Desktop\PIFace Digital II - Kopie\PIFace Digital II\PIFace Digital II.csproj;x64
