@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PIFace_II
+namespace PiFace_II
 {
   public  class ReportConfiguration
     {

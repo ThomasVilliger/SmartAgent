@@ -60,7 +60,7 @@
         <TextBlock Grid.Row="1" Grid.Column="3">Output:</TextBlock>
         <TextBox Grid.Row="2" Grid.Column="3" VerticalAlignment="Stretch" TextWrapping="Wrap" Text="{Binding Output, Mode=TwoWay}" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" />
         <WebView Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Source="{Binding WebViewUri}" />
-        <Button  x:Name="Switch0"  Content= "Button" Grid.Column="1" HorizontalAlignment="Left" Margin="58.5,56,0,0" Grid.Row="2" VerticalAlignment="Top" Height="818" Grid.RowSpan="3" Width="1327" Grid.ColumnSpan="3"/>
+        <Button  x:Name="Switch0"  Content= "Button" Grid.Column="3" HorizontalAlignment="Left" Margin="446,538,0,0" Grid.Row="4" VerticalAlignment="Top" Height="116" Width="451"/>
 
 
 

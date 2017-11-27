@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.System.Threading;
 
-namespace PIFace_II
+namespace PiFace_II
 {
   public  class CycleMachine 
     {
@@ -64,7 +64,7 @@ namespace PIFace_II
 
         private void InputInterpretation(IInput input) 
         {
-            if (input.InputValue == false) // after each falling flank..
+            if (input.State == false) // after each falling flank..
             {
                 DailyCycleCounter++;
                 CycleCounterPerMachineState++;

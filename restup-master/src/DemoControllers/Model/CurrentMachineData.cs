@@ -12,6 +12,7 @@ namespace Restup.DemoControllers.Model
         public int CycleCounterPerMachineState { get; set; }
         public int DailyCycleCunter { get; set; }
         public long LastCycleTime  { get; set; }
-        
+        public string DurationCurrentMachineState { get; set; }
+
     }
 }

@@ -1,0 +1,449 @@
+﻿
+@{
+    //Layout = null;
+
+
+   
+}
+
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>DeviceMonitoring</title>
+
+
+    
+
+
+    <script src="~/lib/jquery/dist/jquery.js"></script> 
+
+    <link href="~/css/deviceMonitoring.css" rel="stylesheet" />
+
+ <!--  <script src="~/css/jquerySignalR.js"></script>  -->
+
+
+   
+     
+    <script src="~/lib/signalr-client-1.0.0-alpha2-final.min.js"></script>
+
+    @*<script src="~/signalr/hubs"></script>*@
+
+</head>
+<body>
+
+    <script>
+
+        $(document).ready(function () {
+
+
+            let hub = new signalR.HubConnection('/MonitoringHub');
+   
+
+     
+
+
+
+
+            hub.on('UpdateInputState', function (parameters) {
+
+                var state = parameters.State;
+                var pinNumber = parameters.PinNumber;
+    if (state == true) {
+    setInputTrue(pinNumber)
+    }
+
+
+
+
+
+
+
+    else {
+    setInputFalse(pinNumber)
+    }
+
+    });
+
+
+            hub.on('UpdateOutputState', function (parameters) {
+
+                var state = parameters.State;
+                var pinNumber = parameters.PinNumber;
+
+    if (state == true) {
+    setOutputTrue(pinNumber)
+    }
+
+    else {
+    setOutputFalse(pinNumber)
+    }
+
+    });
+
+
+
+    $(".input_on").click(function () {
+
+    var state = true;
+    var pinNumber = this.value;
+
+        hub.invoke('UpdateAllClientsInputState', pinNumber, state);
+
+    });
+
+
+    function setInputTrue(pinNumber) {
+    inputIconId = "#inputIco" + pinNumber;
+    $(inputIconId).addClass("io_on");
+
+    }
+
+
+    function setInputFalse(pinNumber) {
+    inputIconId = "#inputIco" + pinNumber;
+    $(inputIconId).removeClass("io_on");
+
+    }
+
+
+
+    $(".input_off").click(function () {
+
+    var state = false;
+    var pinNumber = this.value;
+
+    hub.invoke('UpdateAllClientsInputState', pinNumber, state);
+
+
+    });
+
+
+    $(".output_on").click(function () {
+
+    var state = true;
+    var pinNumber = this.value;
+
+    hub.invoke('UpdateAllClientsOutputState', pinNumber, state);
+
+    });
+
+
+    $(".output_off").click(function () {
+
+    var state = false;
+    var pinNumber = this.value;
+
+    hub.invoke('UpdateAllClientsOutputState', pinNumber, state);
+    });
+
+
+
+    function setOutputTrue(pinNumber) {
+    outputIconId = "#outputIco" + pinNumber;
+    $(outputIconId).addClass("io_on");
+
+    }
+
+
+
+
+    function setOutputFalse(pinNumber) {
+    outputIconId = "#outputIco" + pinNumber;
+    $(outputIconId).removeClass("io_on");
+    }
+
+    hub.start().then(() => (function () { alert('hub Started') }));
+
+    });
+
+
+
+
+
+
+    </script>
+
+
+
+    <h1>Device IO Monitoring</h1>
+
+    <h2>Inputs</h2>
+
+
+    <div class="inputTable">
+
+        <span>
+            <button class="input_off" value="0" type="button">Set 0</button>
+            <button class="input_on" value="0" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">0</span>
+            <span id="inputIco0" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="1" type="button">Set 0</button>
+            <button class="input_on" value="1" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">1</span>
+            <span id="inputIco1" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="2" type="button">Set 0</button>
+            <button class="input_on" value="2" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">2</span>
+            <span id="inputIco2" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="3" type="button">Set 0</button>
+            <button class="input_on" value="3" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">3</span>
+            <span id="inputIco3" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="4" type="button">Set 0</button>
+            <button class="input_on" value="4" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">4</span>
+            <span id="inputIco4" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="5" type="button">Set 0</button>
+            <button class="input_on" value="5" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">5</span>
+            <span id="inputIco5" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="6" type="button">Set 0</button>
+            <button class="input_on" value="6" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">6</span>
+            <span id="inputIco6" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div class="inputTable">
+        <span>
+            <button class="input_off" value="7" type="button">Set 0</button>
+            <button class="input_on" value="7" type="button">Set 1</button>
+        </span>
+
+        <div class="inputBorderClass">
+            <span class="inputHead">7</span>
+            <span id="inputIco7" class="inputIco"><i></i></span>
+            <span class="inputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+
+
+    <div>  <h2>Outputs</h2> </div>
+
+    <div class="outputTable">
+
+        <span>
+            <button class="output_off" value="0" type="button">Set 0</button>
+            <button class="output_on" value="0" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">0</span>
+            <span id="outputIco0" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="1" type="button">Set 0</button>
+            <button class="output_on" value="1" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">1</span>
+            <span id="outputIco1" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="2" type="button">Set 0</button>
+            <button class="output_on" value="2" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">2</span>
+            <span id="outputIco2" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="3" type="button">Set 0</button>
+            <button class="output_on" value="3" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">3</span>
+            <span id="outputIco3" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="4" type="button">Set 0</button>
+            <button class="output_on" value="4" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">4</span>
+            <span id="outputIco4" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="5" type="button">Set 0</button>
+            <button class="output_on" value="5" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">5</span>
+            <span id="outputIco5" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="6" type="button">Set 0</button>
+            <button class="output_on" value="6" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">6</span>
+            <span id="outputIco6" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div class="outputTable">
+        <span>
+            <button class="output_off" value="7" type="button">Set 0</button>
+            <button class="output_on" value="7" type="button">Set 1</button>
+        </span>
+
+        <div class="outputBorderClass">
+            <span class="outputHead">7</span>
+            <span id="outputIco7" class="outputIco"><i></i></span>
+            <span class="outputList">
+                <ul>
+                    <li>counter: </li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+
+
+
+
+</body>
+</html>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PIFace_II
+namespace PiFace_II
 {
     public interface IDevice
     { 
@@ -21,8 +21,9 @@ namespace PIFace_II
     public interface IInput
     {
         string Name { get; }
-        bool InputValue { get; set; }
+        bool State { get; set; }
         event Action<IInput> InputChanged;
+        int PinNumber { get; }
     }
 
 
@@ -30,8 +31,8 @@ namespace PIFace_II
 
     { 
         string Name { get; }
-        bool OutputValue { get; set; }
+        bool State { get; set; }
          event Action<IOutput> OutputChanged;
-        int OutputPin { get; }
+        int PinNumber { get; }
     }
 }

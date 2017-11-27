@@ -1,0 +1,347 @@
+﻿<!DOCTYPE html>
+<html lang="">
+<Head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing Table</title>
+    
+
+
+    <link href="../../wwwroot/css/deviceMonitoring.css" rel="stylesheet" />
+ <!--   <script src="/SignalR/hubs"></script>
+    <script src="../../Scripts/jquery.signalR-2.2.0.js"></script> -->
+    <script src="../../wwwroot/lib/jquery/dist/jquery.js"></script>
+
+</Head>
+<body>
+    
+    
+    <script> 
+      $(document).ready(function() {
+          
+   /*     var hubConnection = 
+             new signalR.HubConnection(`http://${document.location.host}/monitoring`, 'formatType=json&format=text');  
+          
+        
+          hubConnection.on('UpdateIO', parameters => 
+          {
+               $('h1').text('signalRWorkde');
+              
+          }); */
+                           
+                      
+            
+         $(".input_on").click(function(){
+                        
+          
+                inputIconId = "#inputIco" + this.value             
+                $(inputIconId).addClass("io_on"); 
+             
+             var value = 1;
+             hubConnection.invoke('UpdateAllClientsIO', value)
+
+        });
+          
+          
+        $(".input_off").click(function(){
+            
+                inputIconId = "#inputIco" + this.value
+                $(inputIconId).removeClass("io_on");   
+         });
+          
+          
+        $(".output_on").click(function(){
+                        
+                inputIconId = "#outputIco" + this.value             
+                $(inputIconId).addClass("io_on");   
+
+        });
+          
+          
+        $(".output_off").click(function(){
+            
+                inputIconId = "#outputIco" + this.value
+                $(inputIconId).removeClass("io_on");   
+         });
+ 
+        });
+    
+    </script>
+    
+    <h1>Device IO Monitoring</h1>
+
+     <h2>Inputs</h2>
+    
+    
+    <div class="inputTable">
+    
+    <span>  
+        <button class="input_off" value="0" type="button">Set 0</button> 
+        <button class="input_on" value="0" type="button">Set 1</button> 
+    </span> 
+       
+    <div class="inputBorderClass">
+        <span class="inputHead">0</span>
+        <span id="inputIco0" class="inputIco"><i></i></span>
+        <span class="inputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+        </div>
+    </div>
+    <div class="inputTable">
+    <span>  
+        <button class="input_off" value="1" type="button">Set 0</button> 
+        <button class="input_on" value="1" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">1</span>
+        <span id="inputIco1" class="inputIco"><i></i></span>
+        <span class="inputList"> 
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    <div class="inputTable">
+    <span>  
+        <button class="input_off" value="2" type="button">Set 0</button> 
+        <button class="input_on" value="2" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">2</span>
+        <span id="inputIco2" class="inputIco"><i></i></span>
+        <span class="inputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+        <div class="inputTable">
+    <span>  
+        <button class="input_off" value="3" type="button">Set 0</button> 
+        <button class="input_on" value="3" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">3</span>
+        <span id="inputIco3" class="inputIco"><i></i></span>
+        <span class="inputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+        <div class="inputTable">
+    <span>  
+        <button class="input_off" value="4" type="button">Set 0</button> 
+        <button class="input_on" value="4" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">4</span>
+        <span id="inputIco4" class="inputIco"><i></i></span>
+        <span class="inputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    <div class="inputTable">
+    <span>  
+        <button class="input_off" value="5" type="button">Set 0</button> 
+        <button class="input_on" value="5" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">5</span>
+        <span id="inputIco5" class="inputIco"><i></i></span>
+        <span class="inputList"> 
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    <div class="inputTable">
+    <span>  
+        <button class="input_off" value="6" type="button">Set 0</button> 
+        <button class="input_on" value="6" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">6</span>
+        <span id="inputIco6" class="inputIco"><i></i></span>
+        <span class="inputList">
+            <ul>
+               <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+        <div class="inputTable">
+    <span>  
+        <button class="input_off" value="7" type="button">Set 0</button> 
+        <button class="input_on" value="7" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="inputBorderClass"> 
+  <span class="inputHead">7</span>
+        <span id="inputIco7" class="inputIco"><i></i></span>
+        <span class="inputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+    
+    
+    <div>  <h2>Outputs</h2> </div>
+    
+    <div class="outputTable">
+    
+    <span>  
+        <button class="output_off" value="0" type="button">Set 0</button> 
+        <button class="output_on" value="0" type="button">Set 1</button> 
+    </span> 
+       
+    <div class="outputBorderClass">
+        <span class="outputHead">0</span>
+        <span id="outputIco0" class="outputIco"><i></i></span>
+        <span class="outputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+        </div>
+    </div>
+    <div class="outputTable">
+    <span>  
+        <button class="output_off" value="1" type="button">Set 0</button> 
+        <button class="output_on" value="1" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">1</span>
+        <span id="outputIco1" class="outputIco"><i></i></span>
+        <span class="outputList"> 
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    <div class="outputTable">
+    <span>  
+        <button class="output_off" value="2" type="button">Set 0</button> 
+        <button class="output_on" value="2" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">2</span>
+        <span id="outputIco2" class="outputIco"><i></i></span>
+        <span class="outputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+        <div class="outputTable">
+    <span>  
+        <button class="output_off" value="3" type="button">Set 0</button> 
+        <button class="output_on" value="3" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">3</span>
+        <span id="outputIco3" class="outputIco"><i></i></span>
+        <span class="outputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+        <div class="outputTable">
+    <span>  
+        <button class="output_off" value="4" type="button">Set 0</button> 
+        <button class="output_on" value="4" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">4</span>
+        <span id="outputIco4" class="outputIco"><i></i></span>
+        <span class="outputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    <div class="outputTable">
+    <span>  
+        <button class="output_off" value="5" type="button">Set 0</button> 
+        <button class="output_on" value="5" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">5</span>
+        <span id="outputIco5" class="outputIco"><i></i></span>
+        <span class="outputList"> 
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    <div class="outputTable">
+    <span>  
+        <button class="output_off" value="6" type="button">Set 0</button> 
+        <button class="output_on" value="6" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">6</span>
+        <span id="outputIco6" class="outputIco"><i></i></span>
+        <span class="outputList">
+            <ul>
+               <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+        <div class="outputTable">
+    <span>  
+        <button class="output_off" value="7" type="button">Set 0</button> 
+        <button class="output_on" value="7" type="button">Set 1</button> 
+    </span> 
+        
+        <div class="outputBorderClass"> 
+  <span class="outputHead">7</span>
+        <span id="outputIco7" class="outputIco"><i></i></span>
+        <span class="outputList">
+            <ul>
+                <li>counter: </li>
+            </ul>
+        </span>
+		</div>
+    </div>
+    
+</body>
+</html>

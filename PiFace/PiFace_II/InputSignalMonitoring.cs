@@ -3,81 +3,82 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.System.Threading;
 using Windows.UI.Xaml;
 
-namespace PIFace_II
+namespace PiFace_II
 {
-  public  class InputSignalMonitoring : InputSignalMonitoringConfiguration
+  public  class InputSignalMonitoring 
     {
-        //private DispatcherTimer timerCycleTimeOut1;
-        //private DispatcherTimer timerCycleTimeOut2;
+
         private IOutput iOutput;
+
+        private InputSignalMonitoringConfiguration config;
+
+        private ThreadPoolTimer timerCycleTimeOut1;
+        private ThreadPoolTimer timerCycleTimeOut2;
+
+        
 
         public InputSignalMonitoring(IDevice iDevice, InputSignalMonitoringConfiguration inputSignalMonitoringConfiguration)
         {
-            InputPinToMonitor = inputSignalMonitoringConfiguration.InputPinToMonitor;
-            EmailAddressListForNotification = inputSignalMonitoringConfiguration.EmailAddressListForNotification;
-            OutputPinForNotification = inputSignalMonitoringConfiguration.OutputPinForNotification;
+            config = inputSignalMonitoringConfiguration;
 
-            iDevice.Inputs[InputPinToMonitor].InputChanged += InputInterpretation;
+            iDevice.Inputs[config.InputPinToMonitor].InputChanged += InputInterpretation;
 
-            iOutput = iDevice.Outputs[OutputPinForNotification];
+            iOutput = iDevice.Outputs[config.OutputPinForNotification];
 
+   
+            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
+                                       TimeSpan.FromHours(24));
 
-            //timerCycleTimeOut1 = new DispatcherTimer();
-            //timerCycleTimeOut1.Interval = TimeSpan.FromHours(24); //after xHours no Cycle send Mail
-            //timerCycleTimeOut1.Tick += cycleMachineNotAlive;
-            //timerCycleTimeOut1.Start();
-            
-
-            //timerCycleTimeOut2 = new DispatcherTimer();
-            //timerCycleTimeOut2.Interval = TimeSpan.FromSeconds(15); //after xSeconds no Cycle set Output false
-            //timerCycleTimeOut2.Tick += reciveNoCycles;
-            //timerCycleTimeOut2.Start();
+            timerCycleTimeOut2 = ThreadPoolTimer.CreatePeriodicTimer(reciveNoCycles,
+                                       TimeSpan.FromSeconds(15));
 
         }
 
 
-        private void cycleMachineNotAlive(object sender, object e)
+        private void cycleMachineNotAlive(ThreadPoolTimer timer)
         {
             sendEmailToSpecifiedAdressList();
 
-            //timerCycleTimeOut1.Stop();
-            //timerCycleTimeOut1.Start();
+            timerCycleTimeOut1.Cancel();
+            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
+                                        TimeSpan.FromHours(24));
         }
 
-        private void reciveNoCycles(object sender, object e)
+        private void reciveNoCycles(ThreadPoolTimer timer)
         {
             setOutput(false);
-
         }
 
 
         private void InputInterpretation(IInput input) 
         {
-            setOutput(input.InputValue);
+            setOutput(true);
             ResetTimerCycleTimeOut();
         }
 
 
         public void ResetTimerCycleTimeOut()
         {
-            //timerCycleTimeOut1.Stop();
-            //timerCycleTimeOut1.Start();
+            timerCycleTimeOut2.Cancel();
+            timerCycleTimeOut2 = ThreadPoolTimer.CreatePeriodicTimer(reciveNoCycles,
+                                        TimeSpan.FromSeconds(15));
 
-            //timerCycleTimeOut2.Stop();
-            //timerCycleTimeOut2.Start();
+            timerCycleTimeOut1.Cancel();
+            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
+                                        TimeSpan.FromHours(24));
         }
 
         private void setOutput(bool outputValue)
         {
-            iOutput.OutputValue = outputValue;
+            iOutput.State = outputValue;
         }
 
-
-        private void sendEmailToSpecifiedAdressList()
+            private void sendEmailToSpecifiedAdressList()
         {
-
+            // not implemented
         }
     }
 }

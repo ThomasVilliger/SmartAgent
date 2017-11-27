@@ -27,6 +27,7 @@ namespace Restup.DemoControllers
         [UriFormat("/stringencoding")]
         public IGetResponse EncodingDecodingTest([FromContent] MoreComplexData data)
         {
+
             Debug.WriteLine($"Received complex data with text {data.Text}");
             return new GetResponse(GetResponse.ResponseStatus.OK, new MoreComplexData() { Text = data.Text });
         }

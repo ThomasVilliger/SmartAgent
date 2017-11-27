@@ -16,3 +16,21 @@ C:\Users\Zipfeldieb\Desktop\PIFace Digital II\MCP23S17\obj\x64\Release\pri.resfi
 C:\Users\Zipfeldieb\Desktop\PIFace Digital II\MCP23S17\obj\x64\Release\qualifiers.txt
 C:\Users\Zipfeldieb\Desktop\PIFace Digital II\MCP23S17\obj\x64\Release\qualifiers.txt.intermediate
 C:\Users\Zipfeldieb\Desktop\PIFace Digital II\MCP23S17\obj\x64\Release\MultipleQualifiersPerDimensionFound.txt
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\bin\x64\Release\MCP23S17.dll
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\bin\x64\Release\MCP23S17.pdb
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\bin\x64\Release\MCP23S17.pri
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\MCP23S17.csprojResolveAssemblyReference.cache
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\MCP23S17.csproj.CoreCompileInputs.cache
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\MCP23S17.dll
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\MCP23S17.pdb
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\priconfig.xml
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\priconfig.xml.intermediate
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\layout.resfiles
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\layout.resfiles.intermediate
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\resources.resfiles
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\resources.resfiles.intermediate
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\pri.resfiles
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\pri.resfiles.intermediate
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\qualifiers.txt
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\qualifiers.txt.intermediate
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Release\MultipleQualifiersPerDimensionFound.txt

@@ -108,11 +108,13 @@
   <ItemGroup>
     <Compile Include="CycleMachine.cs" />
     <Compile Include="CycleMachineConfiguration.cs" />
+    <Compile Include="DeviceSimulator.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="InputSignalMonitoring.cs" />
     <Compile Include="InputSignalMonitoringConfiguration.cs" />
     <Compile Include="MachineStateHistoryEntity.cs" />
     <Compile Include="PiFaceDevice.cs" />
+    <Compile Include="PiFaceIOcommands.cs" />
     <Compile Include="PiFaceMain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportConfiguration.cs" />

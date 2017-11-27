@@ -7,7 +7,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using PIFace_II;
+using PiFace_II;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -65,15 +65,15 @@ namespace Restup.HeadedDemo
 
         private void Switch0_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            PiFaceMain.WritePiFaceInput(0, true);
-            Switch0.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Red);
+            //PiFaceIOcommands.WritePiFaceInput(0, true);
+            //Switch0.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Red);
         }
 
 
         private void Switch0_PointerReleased(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            PiFaceMain.WritePiFaceInput(0, false);
-            Switch0.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Blue);
+            //PiFaceIOcommands.WritePiFaceInput(0, false);
+            //Switch0.BorderBrush = new SolidColorBrush(Windows.UI.Colors.Blue);
         }
 
     }
