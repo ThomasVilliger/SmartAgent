@@ -1,0 +1,196 @@
+﻿@model IEnumerable<SmartDataHub.Models.SmartAgent>
+
+
+
+
+
+
+<head>
+    <script src="~/lib/SignalR/signalr-client-1.0.0-alpha2-final.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+  
+    <link href="~/css/allViews.css" rel="stylesheet" />
+    <link href="~/css/smartAgentConfiguration.css" rel="stylesheet" />
+
+
+</head>
+
+<script>
+       $(document).ready(function () {
+
+
+           let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
+
+
+           hubConnection.on('TestSmartAgentConnectionResponse', function (connectionSuccess)
+           {
+               $("#connectionInfoText >p").remove();
+               $("#connectionResults >p").remove();
+
+               var resultText;
+               if (connectionSuccess)
+               {
+                   resultText = "connection to SmartAgent successfull";
+
+                   $("#connectionResults").append("<p style=\"color:green;\">" + resultText + "</p>");
+               }
+               else
+               {
+                   resultText = "couldn't connect to SmartAgent";
+
+                   //$("#connectionResults").append("<p class=\"negativResult\">" + resultText + "</p>");
+
+                   $("#connectionResults").append("<p style=\"color:red;\">" + resultText + "</p>");
+               }
+
+
+               
+
+
+
+           });
+
+
+
+
+           hubConnection.on('ReturnSmartAgentConnection', function (hostName, ipAddress, success) {
+
+               $("#connectionInfoText >p").remove();
+
+               if (success != false)
+               {
+                   $("#connectionResults").append("<p>" + hostName + ": " + ipAddress + "</p>");
+               }
+               else
+               {
+                   $("#connectionResults").append("<p style=\"color:red;\">no SmartAgents found in network</p>");
+               }
+
+           });
+
+
+
+
+
+           hubConnection.on('NoConnectionToGatewayHub', function () {
+
+               $("#connectionState").text("no connection to main server");
+
+           });
+
+
+           hubConnection.on('Heartbeat', function () {
+
+               $("#connectionState").text("");
+
+           });
+
+
+
+
+           $(".connectionTestButton").click(function () {
+
+               var smartAgentIpAddress = this.value
+               $("#connectionResults >p").remove();
+
+               var text = "connecting to SmartAgent "  + smartAgentIpAddress + "...";
+               $("#connectionResults").append("<p>" + text + "</p>");
+               hubConnection.invoke('TestSmartAgentConnection', smartAgentIpAddress);
+
+           });
+
+
+
+
+           $(".openWebinterfaceButton").click(function () {
+
+               var smartAgentIpAddress = this.value
+               var port = ":59162";
+               var url = "http://" + smartAgentIpAddress + port;
+
+               window.open(url);
+
+           });
+
+
+           $("#searchSmartAgentsButton").click(function () {
+
+               $("#connectionResults >p").remove(); 
+               var text = "searching availabe SmartAgents in network...";
+               $("#connectionInfoText").append("<p>" + text + "</p>");
+               hubConnection.invoke('GetAllSmartAgentConnections');
+
+           });
+
+
+
+       
+
+
+          
+
+           hubConnection.start();
+
+       });
+</script>
+
+
+
+
+
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>SmartAgent Configuration</h2>
+<h3 id="connectionState"></h3>
+<p>
+    <a asp-action="Create">Add SmartAgent</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IpAddress)
+                </th>
+            <th>
+                <button id="searchSmartAgentsButton">Broadcast Search</button>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IpAddress)
+            </td>
+            <td>
+                <button class="connectionTestButton" value="@item.IpAddress">Test Connection</button>
+            </td>
+
+            <td>
+                <button class="openWebinterfaceButton" value="@item.IpAddress">Open Webinterface</button>
+            </td>
+            
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.SmartAgentId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.SmartAgentId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.SmartAgentId">Delete</a>
+           </td>
+        </tr>
+}
+    </tbody>
+
+</table>
+
+<div id="connectionInfoText"></div>
+<div id="connectionResults"></div>

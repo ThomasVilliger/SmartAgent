@@ -1,83 +1,116 @@
 ﻿
 using Microsoft.AspNetCore.SignalR;
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR.Client;
+using System.Timers;
 
 namespace DeviceMonitoring
 {
+
     public class MonitoringHub : Hub
     {
-        private static readonly HttpClient client = new HttpClient();
+      
+        private IDeviceCommunication deviceCommunication;
+        private static Timer _heartbeatTimer = new Timer(3000);
+        private static IHubClients _clients;
 
-
-        public  Task    SetDeviceInput(int pinNumber, bool state)
+        public MonitoringHub()
         {
-            string url = String.Format(@"http://smartagent:8800/api/writedeviceinput/{0}/state/{1}", pinNumber, state);
-            return client.GetAsync(url);
+            // Dependency Injection... Choose the communication protocol
+            //deviceCommunication = new RESTfulDeviceCommunication(this);
+            deviceCommunication = new SignalRdeviceCommunication(this);
+
+            _heartbeatTimer.Elapsed -= Heartbeat;
+            _heartbeatTimer.Elapsed += Heartbeat;
+            _heartbeatTimer.AutoReset = true;
+            _heartbeatTimer.Start();
         }
 
-
-        public  Task SetDeviceOutput(int pinNumber, bool state)
+        private static void Heartbeat(Object source, ElapsedEventArgs e)
         {
-            string url = String.Format(@"http://smartagent:8800/api/writedeviceoutput/{0}/state/{1}", pinNumber, state);
-            return client.GetAsync(url);
-        }
-
-
-        public async Task UpdateAllInputStates()
-        {
-            string url = String.Format(@"http://smartagent:8800/api/getAllDeviceInputStates");
-
-            HttpResponseMessage getResponse = await client.GetAsync(url);
-
-            int numberOfInputs = Convert.ToInt32(getResponse.Headers.FirstOrDefault(m => m.Key == "NumberOfInputs").Value.FirstOrDefault());
-            List<PinState> inputStates = new List<PinState>();
-
-            for (int i = 0; i < numberOfInputs; i++)
+            if (_clients != null)
             {
-                bool state = Convert.ToBoolean(getResponse.Headers.FirstOrDefault(m => m.Key == String.Format("{0}", i)).Value.FirstOrDefault());
-                inputStates.Add(new PinState { PinNumber = i, State = state });
+                _clients.All.InvokeAsync("Heartbeat", true);
             }
-
-            Clients.Client(Context.ConnectionId).InvokeAsync("UpdateAllInputStates", inputStates);
         }
 
-
-        public async Task UpdateAllOutputStates()
+        public async  Task    SetDeviceInput(int pinNumber, bool state)
         {
-            string url = String.Format(@"http://smartagent:8800/api/getAllDeviceOutputStates");
-
-            HttpResponseMessage getResponse = await client.GetAsync(url);
-
-            int numberOfOutputs = Convert.ToInt32(getResponse.Headers.FirstOrDefault(m => m.Key == "NumberOfOutputs").Value.FirstOrDefault());
-            List<PinState> outputStates = new List<PinState>();
-
-            for (int i = 0; i < numberOfOutputs; i++)
-            {
-                bool state = Convert.ToBoolean(getResponse.Headers.FirstOrDefault(m => m.Key == String.Format("{0}", i)).Value.FirstOrDefault());
-                outputStates.Add(new PinState { PinNumber = i, State = state });
-            }
-            Clients.Client(Context.ConnectionId).InvokeAsync("UpdateAllOutputStates", outputStates);
+        await deviceCommunication.SetDeviceInput(pinNumber, state);
         }
+
+        public async  Task SetDeviceOutput(int pinNumber, bool state)
+        {
+            await deviceCommunication.SetDeviceOutput(pinNumber, state);
+        }
+
+
+        public async Task GetAllInputStates()
+        {
+           await deviceCommunication.GetAllInputStates();
+        }
+
+        public async Task GetAllOutputStates()
+        {
+           await deviceCommunication.GetAllOutputStates();
+        }
+
+        public async Task UpdateAllInputStates(List<PinState> inputStates)
+        {
+            await Clients.Client(UserHandler.ConnectedIds.Last()).InvokeAsync("UpdateAllInputStates", inputStates);
+        }
+
+
+        public async Task UpdateAllOutputStates(List<PinState> outputStates)
+        {
+            await Clients.Client(UserHandler.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);
+        }
+
+        public async Task UpdateSingleInputState(PinState pinState)
+        {
+           await Clients.All.InvokeAsync("UpdateSingleInputState", pinState);
+        }
+
+
+        public async Task UpdateSingleOutputState(PinState pinState)
+        {
+           await Clients.All.InvokeAsync("UpdateSingleOutputState", pinState);
+        }
+
+
+        //public async Task PublishActualCycleMachineData(Dictionary <string, string> actualCycleMachineData )
+
+        //{
+        //    await Clients.All.InvokeAsync("PublishActualCycleMachineData", actualCycleMachineData);
+        //}
+
+
 
         public override Task OnConnectedAsync()
         {
+            _clients = this.Clients;
             UserHandler.ConnectedIds.Add(Context.ConnectionId);
-            Clients.All.InvokeAsync("UpdateClientCounter", UserHandler.ConnectedIds.Count);
+            _clients.All.InvokeAsync("UpdateClientCounter", UserHandler.ConnectedIds.Count);
+            GetAllInputStates();
+            GetAllOutputStates();
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception ex)
         {
+            _clients = this.Clients;
             UserHandler.ConnectedIds.Remove(Context.ConnectionId);
-            Clients.All.InvokeAsync("UpdateClientCounter", UserHandler.ConnectedIds.Count);
+            _clients.All.InvokeAsync("UpdateClientCounter", UserHandler.ConnectedIds.Count);
             return base.OnDisconnectedAsync(ex);
         }
+
+
+
     }
 
     public static class UserHandler

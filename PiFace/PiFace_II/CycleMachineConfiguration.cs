@@ -8,9 +8,10 @@ namespace PiFace_II
 {
     public  class CycleMachineConfiguration
     {
-        public string MachineName;
-        public int MachineId;
-        public int CycleInputPin;
-        public int MachineStateTimeOut;
+        public string MachineName { get; set; }
+        public int MachineId { get; set; }
+        public int CycleInputPin { get; set; }
+        public int MachineStateTimeOut { get; set; }
+        public int PublishingIntervall { get; set; }
     }
 }

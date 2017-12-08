@@ -11,7 +11,7 @@ namespace PiFace_II
   public  class InputSignalMonitoring 
     {
 
-        private IOutput iOutput;
+        private IOutput output;
 
         private InputSignalMonitoringConfiguration config;
 
@@ -20,13 +20,13 @@ namespace PiFace_II
 
         
 
-        public InputSignalMonitoring(IDevice iDevice, InputSignalMonitoringConfiguration inputSignalMonitoringConfiguration)
+        public InputSignalMonitoring(IDevice device, InputSignalMonitoringConfiguration inputSignalMonitoringConfiguration)
         {
             config = inputSignalMonitoringConfiguration;
 
-            iDevice.Inputs[config.InputPinToMonitor].InputChanged += InputInterpretation;
+            device.Inputs[config.InputPinToMonitor].InputChanged += InputInterpretation;
 
-            iOutput = iDevice.Outputs[config.OutputPinForNotification];
+            output = device.Outputs[config.OutputPinForNotification];
 
    
             timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
@@ -73,7 +73,7 @@ namespace PiFace_II
 
         private void setOutput(bool outputValue)
         {
-            iOutput.State = outputValue;
+            output.State = outputValue;
         }
 
             private void sendEmailToSpecifiedAdressList()

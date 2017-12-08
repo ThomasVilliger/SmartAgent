@@ -1,0 +1,146 @@
+﻿@model IEnumerable<SmartDataHub.Models.CycleMachineConfiguration>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<head>
+    <script src="~/lib/SignalR/signalr-client-1.0.0-alpha2-final.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <link href="~/css/allViews.css" rel="stylesheet" />
+</head>
+
+
+<script>
+       $(document).ready(function () {
+
+
+           let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
+
+
+           hubConnection.on('NoConnectionToGatewayHub', function () {
+
+               $("#connectionState").text("no connection to main server");
+
+           });
+
+
+           hubConnection.on('Heartbeat', function () {
+
+               $("#connectionState").text("");
+
+           });
+
+
+           $("#activateConfigButton").click(function () {
+
+               hubConnection.invoke('InitializeNewMachineConfigurations');
+
+           });
+
+
+           hubConnection.start();
+
+       });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h2>Machine Configuration</h2>
+<h3 id="connectionState"></h3>
+<p>
+    <a asp-action="Create">Add Machine</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.MachineName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MachineId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CycleInputPin)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MachineStateTimeOut)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.PublishingIntervall)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Active)
+                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SmartAgent)
+            </th>
+            <th>
+                <button id="activateConfigButton">Activate Config</button>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MachineName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MachineId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CycleInputPin)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MachineStateTimeOut)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PublishingIntervall)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Active)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SmartAgent.IpAddress)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CycleMachineConfigurationId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CycleMachineConfigurationId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CycleMachineConfigurationId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

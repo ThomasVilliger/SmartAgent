@@ -12,12 +12,13 @@ namespace DeviceMonitoring.Controllers
 {
     public class DeviceMonitoringController : Controller
     {
-        private readonly IHubContext<MonitoringHub> hubConnection;
+        private readonly IHubContext<MonitoringHub> _hubContext;
+       
 
    
         public DeviceMonitoringController(IHubContext<MonitoringHub> hubContext)
-        {
-            hubConnection = hubContext;
+        {      
+           _hubContext = hubContext;
         }
 
 
@@ -79,7 +80,7 @@ namespace DeviceMonitoring.Controllers
         
         
 
-                hubConnection.Clients.All.InvokeAsync("UpdateSingleInputState", pinState);
+                _hubContext.Clients.All.InvokeAsync("UpdateSingleInputState", pinState);
 
 
                 return RedirectToAction(nameof(Index));
@@ -90,6 +91,53 @@ namespace DeviceMonitoring.Controllers
 
             }
         }
+
+
+
+
+
+
+        //// POST: DeviceIOcontroller/Create
+        //[HttpPost]
+        ////  [ValidateAntiForgeryToken]
+        //public ActionResult PublishActualCycleMachineData(IFormCollection collection)
+        //{
+        //    try
+        //    {
+        //    Dictionary<string, string> actualCycleMachineData = new Dictionary<string, string>();
+
+        //    var form = new Dictionary<string, string>();
+        //        foreach (var key in collection.Keys)
+        //        {
+        //            var value = collection[key];
+        //            actualCycleMachineData.Add(key.ToString(), value.ToString());
+        //        }
+
+
+
+
+        //        _hubContext.Clients.All.InvokeAsync("PublishActualCycleMachineData", actualCycleMachineData);
+
+
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    catch
+        //    {
+        //        return View();
+
+        //    }
+        //}
+
+
+
+
+
+
+
+
+
+
+
 
 
         // POST: DeviceIOcontroller/Create
@@ -110,9 +158,9 @@ namespace DeviceMonitoring.Controllers
                 //Clients.All.UpdateInput(pinNumber, state); old
 
 
+              
 
-
-                hubConnection.Clients.All.InvokeAsync("UpdateSingleOutputState", pinState);
+                _hubContext.Clients.All.InvokeAsync("UpdateSingleOutputState", pinState);
 
 
                 return RedirectToAction(nameof(Index));

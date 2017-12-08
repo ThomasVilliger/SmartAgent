@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PiFace_II.DeviceGatewayCommunication;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,21 +19,23 @@ namespace PiFace_II
         public List<IInput> Inputs { get; } = new List<IInput>();
 
         public List<IOutput> Outputs { get; } = new List<IOutput>();
+       
 
-      
 
-        public DeviceSimulator(bool produceRandomInputValues)
+        public DeviceSimulator(IMonitoringHubCommunication gatewayCommunication, bool produceRandomInputValues)
         {
             randomize = produceRandomInputValues;
 
             for (int i = 0; i < NumberOfInputs; i++)
             {
                 this.Inputs.Add(new DeviceSimulatorInput(i));
+                Inputs[i].InputChanged += gatewayCommunication.UpdateSingleInputState;
             }
 
             for (int i = 0; i < NumberOfInputs; i++)
             {
                 this.Outputs.Add(new DeviceSimulatorOutput(i));
+                Outputs[i].OutputChanged += gatewayCommunication.UpdateSingleOutputState;
             }
         }
     }

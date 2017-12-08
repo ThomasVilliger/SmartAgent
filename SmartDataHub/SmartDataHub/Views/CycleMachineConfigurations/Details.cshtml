@@ -1,0 +1,60 @@
+﻿@model SmartDataHub.Models.CycleMachineConfiguration
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>CycleMachineConfiguration</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MachineName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MachineName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MachineId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MachineId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CycleInputPin)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CycleInputPin)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MachineStateTimeOut)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MachineStateTimeOut)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PublishingIntervall)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PublishingIntervall)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SmartAgent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SmartAgent.IpAddress)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.CycleMachineConfigurationId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

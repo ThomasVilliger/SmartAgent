@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PiFace_II.DeviceGatewayCommunication;
 
 namespace PiFace_II
 {
@@ -18,16 +19,22 @@ namespace PiFace_II
 
         public List<IOutput> Outputs { get; } = new List<IOutput>();
 
-        public PiFaceDevice()
+        public IMonitoringHubCommunication GatewayCommunication { get; }
+
+        public PiFaceDevice(IMonitoringHubCommunication gatewayCommunication)
         {
+            GatewayCommunication = gatewayCommunication;
             for (int i = 0; i < NumberOfInputs; i++)
             {
                 this.Inputs.Add(new PiFaceInput(i));
+                Inputs[i].InputChanged += GatewayCommunication.UpdateSingleInputState;
             }
 
-            for (int i = 0; i < NumberOfInputs; i++)
+            for (int i = 0; i < NumberOfOutputs; i++)
             {
                 this.Outputs.Add(new PiFaceOutput(i));
+                Outputs[i].OutputChanged += GatewayCommunication.UpdateSingleOutputState;
+                Outputs[i].OutputChanged += PiFaceIOcommands.WriteOutput;
             }
 
             initPiFace();
@@ -41,11 +48,6 @@ namespace PiFace_II
         {
             initSPIchip();
             PiFaceIOcommands.InitPiFaceIO(this);
-
-            foreach (IOutput iOutput in Outputs)
-            {
-                iOutput.OutputChanged += PiFaceIOcommands.WriteOutput;
-            }
         }
 
 

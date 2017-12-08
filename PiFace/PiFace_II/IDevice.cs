@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PiFace_II.DeviceGatewayCommunication;
 
 namespace PiFace_II
 {
     public interface IDevice
-    { 
+    {
         int NumberOfOutputs { get; }
         int NumberOfInputs { get; }
         string DeviceName { get; }
         double DeviceVersion { get; }
-        List<IInput>Inputs { get;}
+        List<IInput> Inputs { get; }
         List<IOutput> Outputs { get; }
+        
 
     }
 

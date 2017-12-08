@@ -51,3 +51,4 @@ C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x
 C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Debug\qualifiers.txt
 C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Debug\qualifiers.txt.intermediate
 C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Debug\MultipleQualifiersPerDimensionFound.txt
+C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\MCP23S17\obj\x64\Debug\MCP23S17.csprojResolveAssemblyReference.cache

@@ -1,0 +1,48 @@
+﻿@model SmartDataHub.Models.InputMonitoringConfiguration
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>InputMonitoringConfiguration</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MonitoringName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MonitoringName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InputPin)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InputPin)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.OutputPin)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.OutputPin)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Active)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Active)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SmartAgent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SmartAgent.IpAddress)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.InputMonitoringConfigurationId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

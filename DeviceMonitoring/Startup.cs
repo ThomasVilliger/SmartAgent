@@ -15,8 +15,7 @@ namespace DeviceMonitoring
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-             
-    }
+        }
 
         public IConfiguration Configuration { get; }
 
@@ -25,15 +24,46 @@ namespace DeviceMonitoring
         {
             services.AddMvc();
             services.AddSignalR();
+            services.AddCors();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigins",
+builder =>
+{
+builder.AllowAnyOrigin();
+});
+            });
+
+
+
+
+
+
+
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+
+
+
+   //         app.UseCors(builder =>
+   //builder.WithOrigins("http://localhost:50412"));
+
+            //app.UseCors("AllowSpecificOrigin");
+
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
+
+               
             }
             else
             {
@@ -42,10 +72,30 @@ namespace DeviceMonitoring
 
             app.UseStaticFiles();
 
+
+
+
+
+
+
+
+
+
+
+
+
+
             app.UseSignalR(routes =>
             {
+                
+                routes.MapHub<GatewayHub>("GatewayHub");
                 routes.MapHub<MonitoringHub>("MonitoringHub");
+
             });
+
+
+
+          
 
 
 
@@ -55,9 +105,6 @@ namespace DeviceMonitoring
                     name: "default",
                     template: "{controller=DeviceMonitoring}/{action=Index}/{id?}");
             });
-
-
-       
         }
     }
 }

@@ -1,0 +1,18 @@
+﻿button{
+    width: 150px;
+}
+
+
+.negativResult
+{
+
+    background-color: red;
+
+}
+
+
+.positivResult {
+    color: green;
+    background-color: green;
+
+}

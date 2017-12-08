@@ -43,7 +43,7 @@ namespace Restup.DemoControllers
         [UriFormat("/getCurrentMachineData/{machineId}")]
         public IGetResponse GetCurrentMachineData(int machineId)
         {
-            CycleMachine cycleMachine = PiFaceMain.cycleMachines.FirstOrDefault(m => m.CycleMachineConfiguration.MachineId == machineId);
+            CycleMachine cycleMachine = _piFaceMain.GatewayHubHandler.CycleMachines.FirstOrDefault(m => m.CycleMachineConfiguration.MachineId == machineId);
             MachineStateHistoryEntity lastMachineStateHistoryEntity = cycleMachine.MachineStateHistory.LastOrDefault();
             TimeSpan durationCurrentMachineState;
             if (lastMachineStateHistoryEntity != null)
@@ -69,7 +69,7 @@ namespace Restup.DemoControllers
         [UriFormat("/getMachineHistory/{machineId}")]
         public IGetResponse GetMachineHistory(int machineId)
         {
-            machineStateHistory = PiFaceMain.cycleMachines.FirstOrDefault(m=>m.CycleMachineConfiguration.MachineId == machineId).MachineStateHistory;
+            machineStateHistory = _piFaceMain.GatewayHubHandler.CycleMachines.FirstOrDefault(m=>m.CycleMachineConfiguration.MachineId == machineId).MachineStateHistory;
 
             //MemoryStream stream1 = new MemoryStream();
             //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<MachineStateHistoryEntity>));
