@@ -13,7 +13,7 @@ namespace PiFace_II
     {
         private static HubConnection _hub;
         private IDevice _device;
-        private static ThreadPoolTimer _heartbeatWatchdog;
+        private  ThreadPoolTimer _heartbeatWatchdog;
 
         public MonitoringHubHandler(IDevice device)
         {
@@ -40,8 +40,9 @@ namespace PiFace_II
 
         private void NoConnectionToGatewayHub(ThreadPoolTimer timer)
         {
-            EstablishHubConnection();
 
+            _hub.DisposeAsync();
+            EstablishHubConnection();
             ResetHeartbeatWatchDog();
 
         }
@@ -59,7 +60,7 @@ namespace PiFace_II
 
 
            
-            string url = @"http://localhost:59162/MonitoringHub";
+            string url = @"http://192.168.0.13:59162/MonitoringHub";
         _hub = new HubConnectionBuilder().WithUrl(url).Build();
             _hub.On<bool>("Heartbeat", p => Heartbeat(p));
             _hub.On<PinState>("SetDeviceInput", pinState => SetDeviceInput(pinState));
@@ -89,7 +90,7 @@ namespace PiFace_II
         private void GetAllOutputStates()
         {
             List<PinState> outputStates = new List<PinState>();
-            foreach (IInput output in _device.Inputs)
+            foreach (IOutput output in _device.Outputs)
             {
                 outputStates.Add(new PinState { PinNumber = output.PinNumber, State = output.State });
             }
@@ -105,35 +106,15 @@ namespace PiFace_II
 
 
         private void SetDeviceInput(PinState pinState)
-        {           
-            try
-            {
-                if (pinState.PinNumber < _device.NumberOfInputs)
-                {
-                    _device.Inputs[pinState.PinNumber].State = pinState.State;
-                }
-            }
-            catch (Exception)
-            {
-
-            }
+        {
+            _device.SetDeviceInput(pinState.PinNumber, pinState.State);
         }
 
 
 
         private void SetDeviceOutput(PinState pinState)
         {
-            try
-            {
-                if (pinState.PinNumber < _device.NumberOfOutputs)
-                {
-                    _device.Outputs[pinState.PinNumber].State = pinState.State;
-                }
-            }
-            catch (Exception)
-            {
-
-            }
+            _device.SetDeviceOutput(pinState.PinNumber, pinState.State);
         }
     }
 

@@ -33,7 +33,7 @@ namespace SmartDataHub.Migrations
                     b.Property<int>("MachineId");
 
                     b.Property<string>("MachineName")
-                        .IsRequired();
+                    .IsRequired();
 
                     b.Property<int>("MachineStateTimeOut");
 

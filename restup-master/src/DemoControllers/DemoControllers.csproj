@@ -122,6 +122,10 @@
     <EmbeddedResource Include="Properties\DemoControllers.rd.xml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\PiFace\DataStorageLibrary\DataStorageLibrary.csproj">
+      <Project>{43d855ee-68a1-4b42-8c84-76ebc24fff2a}</Project>
+      <Name>DataStorageLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\PiFace\PiFace_II\PiFace_II.csproj">
       <Project>{7138993b-6499-4ce0-88a5-799ba1328788}</Project>
       <Name>PiFace_II</Name>

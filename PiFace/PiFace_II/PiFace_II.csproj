@@ -114,8 +114,8 @@
     <Compile Include="DeviceSimulator.cs" />
     <Compile Include="GatewayHubHandler.cs" />
     <Compile Include="IDevice.cs" />
-    <Compile Include="InputSignalMonitoring.cs" />
-    <Compile Include="InputSignalMonitoringConfiguration.cs" />
+    <Compile Include="InputMonitoring.cs" />
+    <Compile Include="InputMonitoringConfiguration.cs" />
     <Compile Include="MachineStateHistoryEntity.cs" />
     <Compile Include="MonitoringHubHandler.cs" />
     <Compile Include="PiFaceDevice.cs" />
@@ -135,6 +135,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataStorageLibrary\DataStorageLibrary.csproj">
+      <Project>{43d855ee-68a1-4b42-8c84-76ebc24fff2a}</Project>
+      <Name>DataStorageLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MCP23S17\MCP23S17.csproj">
       <Project>{f885c334-1f9a-495c-b765-4d74218d3321}</Project>
       <Name>MCP23S17</Name>

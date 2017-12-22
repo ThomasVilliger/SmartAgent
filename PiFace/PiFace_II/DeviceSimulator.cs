@@ -38,7 +38,48 @@ namespace PiFace_II
                 Outputs[i].OutputChanged += gatewayCommunication.UpdateSingleOutputState;
             }
         }
+
+
+
+
+
+        public void SetDeviceInput(int pinNumber, bool state)
+        {
+                if (pinNumber < NumberOfInputs)
+                {
+                    Inputs[pinNumber].State = state;
+                }        
+        }
+
+
+        public void SetDeviceOutput(int pinNumber, bool state)
+        {
+                if (pinNumber < NumberOfInputs)
+                {
+                    Outputs[pinNumber].State = state;
+                }
+        }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public class DeviceSimulatorInput : IInput
     {
@@ -63,6 +104,9 @@ namespace PiFace_II
                                    TimeSpan.FromMilliseconds(1000));
             }
         }
+
+
+
 
         public bool State
         {
