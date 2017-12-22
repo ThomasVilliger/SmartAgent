@@ -9,13 +9,11 @@ namespace PiFace_II
    public class MachineStateHistoryEntity
     {
         public CycleMachine.MachineState MachineState { get; set; }
-
         public DateTime StartDateTime { get; set; }
         public DateTime EndDateTime { get; set; }
         public TimeSpan Duration { get; set; }
-
         public int DailyCycleCoutner { get; set; }
-        public int CycleCounterPerMachineState { get; set; }
+        public int CyclesInThisPeriod { get; set; }
 
         public  MachineStateHistoryEntity(CycleMachine.MachineState machineState)
         {

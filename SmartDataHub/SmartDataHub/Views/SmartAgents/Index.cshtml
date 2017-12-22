@@ -22,51 +22,48 @@
            let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
 
 
-           hubConnection.on('TestSmartAgentConnectionResponse', function (connectionSuccess)
+           hubConnection.on('Response', function (success, message, isGreenColored)
            {
-               $("#connectionInfoText >p").remove();
-               $("#connectionResults >p").remove();
 
-               var resultText;
-               if (connectionSuccess)
-               {
-                   resultText = "connection to SmartAgent successfull";
+                   var resultText;
+                   $("#infosHeader").text(""); 
+                   if (success) {
 
-                   $("#connectionResults").append("<p style=\"color:green;\">" + resultText + "</p>");
-               }
-               else
-               {
-                   resultText = "couldn't connect to SmartAgent";
+                       if (isGreenColored) {
+                           $("#infos").append("<p style=\"color:green;\">" + message + "</p>");
+                       }
+                       else {
 
-                   //$("#connectionResults").append("<p class=\"negativResult\">" + resultText + "</p>");
-
-                   $("#connectionResults").append("<p style=\"color:red;\">" + resultText + "</p>");
-               }
+                           $("#infos").append("<p>" + message + "</p>");
+                       }
+                   }
+                   else {
 
 
+                       $("#infos").append("<p style=\"color:red;\">" + message + "</p>");
+                   }
                
 
 
-
            });
 
 
 
 
-           hubConnection.on('ReturnSmartAgentConnection', function (hostName, ipAddress, success) {
+           //hubConnection.on('ReturnSmartAgentConnection', function (hostName, ipAddress, success) {
 
-               $("#connectionInfoText >p").remove();
+           //    //$("#connectionInfoText >p").remove();
 
-               if (success != false)
-               {
-                   $("#connectionResults").append("<p>" + hostName + ": " + ipAddress + "</p>");
-               }
-               else
-               {
-                   $("#connectionResults").append("<p style=\"color:red;\">no SmartAgents found in network</p>");
-               }
+           //    if (success != false)
+           //    {
+           //        $("#infos").append("<p>" + hostName + ": " + ipAddress + "</p>");
+           //    }
+           //    else
+           //    {
+           //        $("#infos").append("<p style=\"color:red;\">no SmartAgents found in network</p>");
+           //    }
 
-           });
+           //});
 
 
 
@@ -88,13 +85,13 @@
 
 
 
-           $(".connectionTestButton").click(function () {
+           $(".testSmartAgentConnection").click(function () {
 
                var smartAgentIpAddress = this.value
-               $("#connectionResults >p").remove();
+               $("#infos >p").remove();
 
                var text = "connecting to SmartAgent "  + smartAgentIpAddress + "...";
-               $("#connectionResults").append("<p>" + text + "</p>");
+               $("#infosHeader").text(text);
                hubConnection.invoke('TestSmartAgentConnection', smartAgentIpAddress);
 
            });
@@ -102,7 +99,7 @@
 
 
 
-           $(".openWebinterfaceButton").click(function () {
+           $(".openWebinterface").click(function () {
 
                var smartAgentIpAddress = this.value
                var port = ":59162";
@@ -113,17 +110,32 @@
            });
 
 
-           $("#searchSmartAgentsButton").click(function () {
+           $("#searchSmartAgents").click(function () {
 
-               $("#connectionResults >p").remove(); 
+               $("#infos >p").remove(); 
                var text = "searching availabe SmartAgents in network...";
-               $("#connectionInfoText").append("<p>" + text + "</p>");
+               $("#infosHeader").text(text);
                hubConnection.invoke('GetAllSmartAgentConnections');
 
            });
 
 
 
+
+           $(".initializeConfiguration").click(function () {
+
+               $("#infos >p").remove(); 
+
+               var smartAgentIpAddress = this.value
+               var smartAgentId = this.getAttribute("data-value2");
+               hubConnection.invoke('InitializeNewMachineConfigurations', smartAgentIpAddress, smartAgentId);
+
+               var text = "inizialize SmartAgent " + smartAgentIpAddress + "...";
+
+               $("#infosHeader").text(text); 
+
+
+           });
        
 
 
@@ -159,7 +171,7 @@
                     @Html.DisplayNameFor(model => model.IpAddress)
                 </th>
             <th>
-                <button id="searchSmartAgentsButton">Broadcast Search</button>
+                <button id="searchSmartAgents">Broadcast Search</button>
             </th>
             <th></th>
         </tr>
@@ -174,11 +186,14 @@
                 @Html.DisplayFor(modelItem => item.IpAddress)
             </td>
             <td>
-                <button class="connectionTestButton" value="@item.IpAddress">Test Connection</button>
+                <button class="testSmartAgentConnection" value="@item.IpAddress">Test Connection</button>
             </td>
 
             <td>
-                <button class="openWebinterfaceButton" value="@item.IpAddress">Open Webinterface</button>
+                <button class="openWebinterface" value="@item.IpAddress">Open Webinterface</button>
+            </td>
+            <td>
+                <button class="initializeConfiguration" value="@item.IpAddress" data-value2="@item.SmartAgentId">Initialize Config</button>
             </td>
             
             <td>
@@ -192,5 +207,6 @@
 
 </table>
 
-<div id="connectionInfoText"></div>
-<div id="connectionResults"></div>
+@*<div id="connectionInfoText"></div>*@
+<div id="infosHeader"></div>
+<div id="infos"></div>

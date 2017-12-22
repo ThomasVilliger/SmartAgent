@@ -147,7 +147,7 @@
         <div id="machine-table" class="clear">
             <div class="plan">
                 <h3>@Html.DisplayFor(modelItem => item.MachineName)</h3>
-                <label id="machineState_@Html.DisplayFor(modelItem => item.MachineId)" class="machineStateLabel">Unknown</label>
+                <label id="machineState_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="machineStateLabel">Unknown</label>
 
                 <table>
 
@@ -157,7 +157,7 @@
                             <b>Cycle Counter</b>
                         </td>
 
-                        <td id="cycleCounterValue_@Html.DisplayFor(modelItem => item.MachineId)" class="cycleCounterValue">
+                        <td id="cycleCounterValue_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="cycleCounterValue">
                             -
                         </td>
 
@@ -169,7 +169,7 @@
                             <b>Cycle Time </b>
                         </td>
 
-                        <td id="cycleTimeValue_@Html.DisplayFor(modelItem => item.MachineId)" class="cycleTimeValue">
+                        <td id="cycleTimeValue_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="cycleTimeValue">
                             -
                         </td>
                     </tr>
@@ -180,7 +180,7 @@
                             <b>State Duration </b>
                         </td>
 
-                        <td id="stateDurationValue_@Html.DisplayFor(modelItem => item.MachineId)" class="stateDurationValue">
+                        <td id="stateDurationValue_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="stateDurationValue">
                             -
                         </td>
 

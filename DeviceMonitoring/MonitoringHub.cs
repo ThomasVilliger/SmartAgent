@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 using System.Timers;
+using System.Collections.ObjectModel;
 
 namespace DeviceMonitoring
 {
@@ -62,13 +63,13 @@ namespace DeviceMonitoring
 
         public async Task UpdateAllInputStates(List<PinState> inputStates)
         {
-            await Clients.Client(UserHandler.ConnectedIds.Last()).InvokeAsync("UpdateAllInputStates", inputStates);
+            await Clients.All.InvokeAsync("UpdateAllInputStates", inputStates);
         }
 
 
         public async Task UpdateAllOutputStates(List<PinState> outputStates)
         {
-            await Clients.Client(UserHandler.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);
+            await Clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);  // TODO!!!!!
         }
 
         public async Task UpdateSingleInputState(PinState pinState)
@@ -94,8 +95,12 @@ namespace DeviceMonitoring
         public override Task OnConnectedAsync()
         {
             _clients = this.Clients;
-            UserHandler.ConnectedIds.Add(Context.ConnectionId);
-            _clients.All.InvokeAsync("UpdateClientCounter", UserHandler.ConnectedIds.Count);
+
+          
+
+            ConnectionCounter.ConnectedIds.Add(Context.ConnectionId);
+            _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
+
             GetAllInputStates();
             GetAllOutputStates();
             return base.OnConnectedAsync();
@@ -104,8 +109,9 @@ namespace DeviceMonitoring
         public override Task OnDisconnectedAsync(Exception ex)
         {
             _clients = this.Clients;
-            UserHandler.ConnectedIds.Remove(Context.ConnectionId);
-            _clients.All.InvokeAsync("UpdateClientCounter", UserHandler.ConnectedIds.Count);
+           
+            ConnectionCounter.ConnectedIds.Remove(Context.ConnectionId);
+            _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
             return base.OnDisconnectedAsync(ex);
         }
 
@@ -113,7 +119,7 @@ namespace DeviceMonitoring
 
     }
 
-    public static class UserHandler
+    public static class ConnectionCounter
     {
         public static HashSet<string> ConnectedIds = new HashSet<string>();
     }

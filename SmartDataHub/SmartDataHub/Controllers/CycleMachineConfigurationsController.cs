@@ -48,7 +48,7 @@ namespace SmartDataHub.Controllers
         // GET: CycleMachineConfigurations/Create
         public IActionResult Create()
         {
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress");
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name"); // Change IpAddress TO Name!!!!
             return View();
         }
 
@@ -57,7 +57,7 @@ namespace SmartDataHub.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CycleMachineConfigurationId,SmartAgentId,MachineName,MachineId,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] CycleMachineConfiguration cycleMachineConfiguration)
+        public async Task<IActionResult> Create([Bind("CycleMachineConfigurationId,SmartAgentId,MachineName,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] CycleMachineConfiguration cycleMachineConfiguration)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +65,7 @@ namespace SmartDataHub.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", cycleMachineConfiguration.SmartAgentId);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", cycleMachineConfiguration.SmartAgentId); // Change IpAddress TO Name!!!!
             return View(cycleMachineConfiguration);
         }
 
@@ -82,7 +82,7 @@ namespace SmartDataHub.Controllers
             {
                 return NotFound();
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", cycleMachineConfiguration.SmartAgentId);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", cycleMachineConfiguration.SmartAgentId); // Change IpAddress TO Name!!!!
             return View(cycleMachineConfiguration);
         }
 
@@ -91,7 +91,7 @@ namespace SmartDataHub.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CycleMachineConfigurationId,SmartAgentId,MachineName,MachineId,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] CycleMachineConfiguration cycleMachineConfiguration)
+        public async Task<IActionResult> Edit(int id, [Bind("CycleMachineConfigurationId,SmartAgentId,MachineName,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] CycleMachineConfiguration cycleMachineConfiguration)
         {
             if (id != cycleMachineConfiguration.CycleMachineConfigurationId)
             {
@@ -118,7 +118,7 @@ namespace SmartDataHub.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", cycleMachineConfiguration.SmartAgentId);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", cycleMachineConfiguration.SmartAgentId); // Change IpAddress TO Name!!!!
             return View(cycleMachineConfiguration);
         }
 

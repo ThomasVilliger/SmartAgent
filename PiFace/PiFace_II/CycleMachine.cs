@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.System.Threading;
+using DataStorageLibrary;
 
 
 
@@ -14,7 +15,7 @@ namespace PiFace_II
   public  class CycleMachine 
     {
         public int DailyCycleCounter { get; set; } // TODO Reset at 24:00:00
-        public int CycleCounterPerMachineState { get; set; }
+        public int CyclesInThisPeriod { get; set; }
         public long LastCycleTime { get; set; }
 
         public TimeSpan StateDuration { get; set; }
@@ -38,11 +39,13 @@ namespace PiFace_II
         Stopwatch cycleTimeStopWatch = new Stopwatch();
 
         private GatewayHubHandler _gatewayHubCommunication;
+
+        private IDevice _device;
         
 
         public CycleMachine ( IDevice device  , GatewayHubHandler gatewayHubCommunication, CycleMachineConfiguration cycleMachineConfiguration)
         {
-
+            _device = device;
             MachineStateStarted = DateTime.Now;
 
             CycleMachineConfiguration = cycleMachineConfiguration;
@@ -88,7 +91,7 @@ namespace PiFace_II
             if (input.State == false) // after each falling flank..
             {
                 DailyCycleCounter++;
-                CycleCounterPerMachineState++;
+                CyclesInThisPeriod++;
                 cycleTimeStopWatch.Stop();
                 LastCycleTime = cycleTimeStopWatch.ElapsedMilliseconds;
 
@@ -135,27 +138,75 @@ namespace PiFace_II
         }
 
 
+        public void StopMachineDataGeneration()
+        {
+            timerCycleMachineDataPublish.Cancel();
+            timerCycleTimeOut.Cancel();
+            _device.Inputs[CycleMachineConfiguration.CycleInputPin].InputChanged -= InputInterpretation;
+        }
+
+
         private void feedMachineStateHistory()
         {
-            
-            
-                if (MachineStateHistory.Count > 0 && MachineStateHistory.Last().EndDateTime == DateTime.MinValue)  // conclude last machine state..
+
+
+            if (MachineStateHistory.Count > 0 && MachineStateHistory.Last().EndDateTime == DateTime.MinValue)  // conclude last machine state..
+            {
+                MachineStateHistoryEntity lastEntity = MachineStateHistory.Last();
+                if (LastMachineStateInMachineStateHistory == lastEntity.MachineState)
                 {
-                     MachineStateHistoryEntity lastMachineStateHistoryEntity = MachineStateHistory.Last();
-                if (LastMachineStateInMachineStateHistory == lastMachineStateHistoryEntity.MachineState)
-                    {
-                    lastMachineStateHistoryEntity.EndDateTime = DateTime.Now;
-                    lastMachineStateHistoryEntity.Duration = lastMachineStateHistoryEntity.EndDateTime - lastMachineStateHistoryEntity.StartDateTime;
+                    lastEntity.EndDateTime = DateTime.Now;
+                    lastEntity.Duration = lastEntity.EndDateTime - lastEntity.StartDateTime;
 
-                    lastMachineStateHistoryEntity.DailyCycleCoutner = DailyCycleCounter;
-                    lastMachineStateHistoryEntity.CycleCounterPerMachineState = CycleCounterPerMachineState;
-                }
-                }
+                    lastEntity.DailyCycleCoutner = DailyCycleCounter;
+                    lastEntity.CyclesInThisPeriod = CyclesInThisPeriod;
 
-            MachineStateHistory.Add(new MachineStateHistoryEntity(CurrentMachineState));
+                    DataStorageLibrary.DataStorageLibrary.AddDataMachineStateHistory(
+
+              new Dictionary<string, string> {
+
+
+           { "MachineState", lastEntity.MachineState.ToString() },
+           { "DailyCycleCounter", lastEntity.DailyCycleCoutner.ToString() },
+           { "CyclesInThisPeriod", lastEntity.CyclesInThisPeriod.ToString()},
+           { "StartDateTime", lastEntity.StartDateTime.ToString() },
+           { "EndDateTime", lastEntity.EndDateTime.ToString()},
+           { "MachineId", CycleMachineConfiguration.MachineId.ToString() },
+           { "Duration", lastEntity.Duration.ToString(@"dd\.hh\:mm\:ss") }
+     });
+
+
+
+                }
+            }
+
+
+
+            
+
+
+
+
+
+
+
 
             LastMachineStateInMachineStateHistory = CurrentMachineState;
-            CycleCounterPerMachineState = 0;
+            CyclesInThisPeriod = 0;
+
+            int index;
+            if(MachineStateHistory.Count()>20)
+            {
+                index = MachineStateHistory.Count() - 20;
+            }
+            else
+            {
+                index = 0;
+            }
+
+            MachineStateHistory.RemoveRange(0, index);
+
+            MachineStateHistory.Add(new MachineStateHistoryEntity(CurrentMachineState));
         }
     }
 }

@@ -20,8 +20,8 @@ namespace SmartDataHub
         
       
         private static HubConnection _gatewayHub;
-        private static Timer _heartbeatWatchdog = new Timer(9000);
-        private static Timer _testSmartAgentConnectionTimer = new Timer(3000);
+        private static  Timer _heartbeatWatchdog = new Timer(9000);
+        //private static Timer _testSmartAgentConnectionTimer = new Timer(3000);
         private static Timer _broadcastAllSmargAgentsTimer = new Timer(3000);
 
         public static DbSet<CycleMachineConfiguration> _cycleMachineConfigurationContext {
@@ -36,7 +36,7 @@ namespace SmartDataHub
                     _cycleMachinesConfigurations.Add(new Dictionary<string, string>
                 {
                     {"MachineName", c.MachineName },
-                    {"MachineId", c.MachineId.ToString() },
+                    {"MachineId", c.CycleMachineConfigurationId.ToString() },
                     {"CycleInputPin", c.CycleInputPin.ToString() },
                     {"MachineStateTimeOut", c.MachineStateTimeOut.ToString() },
                     {"PublishingIntervall", c.PublishingIntervall.ToString() }
@@ -55,7 +55,7 @@ namespace SmartDataHub
         {
 
             _broadcastAllSmargAgentsTimer.Elapsed += NoSmartAgentsFoundInNetwork;
-            _testSmartAgentConnectionTimer.Elapsed += NoConnectionTestResponse;
+            //_testSmartAgentConnectionTimer.Elapsed += NoConnectionTestResponse;
             _heartbeatWatchdog.Elapsed += NoConnectionToGatewayHub;
             _heartbeatWatchdog.Start();
 
@@ -68,10 +68,10 @@ namespace SmartDataHub
             ReturnSmartAgentConnection(null);
         }
 
-        private static void NoConnectionTestResponse(object sender, ElapsedEventArgs e)
-        {
-            TestSmartAgentConnectionResponse(false);
-        }
+        //private static void NoConnectionTestResponse(object sender, ElapsedEventArgs e)
+        //{
+        //    //TestSmartAgentConnectionResponse(false);
+        //}
 
 
 
@@ -81,6 +81,8 @@ namespace SmartDataHub
           
             
                 SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("NoConnectionToGatewayHub");
+
+            _gatewayHub.DisposeAsync();
             
             EstablishGatewayHubConnection();
             ResetHeartbeatWatchdogTimer();
@@ -94,7 +96,7 @@ namespace SmartDataHub
             _gatewayHub.On<Dictionary<string, string>>("PublishActualCycleMachineData", actualCycleMachineData => PublishActualCycleMachineData(actualCycleMachineData));
 
             _gatewayHub.On<bool>("Heartbeat", p => GatewayHubHeartbeat(p));
-            _gatewayHub.On<bool>("TestSmartAgentConnectionResponse", connectionSuccess => TestSmartAgentConnectionResponse(connectionSuccess));
+            //_gatewayHub.On<bool>("TestSmartAgentConnectionResponse", connectionSuccess => TestSmartAgentConnectionResponse(connectionSuccess));
             _gatewayHub.On<List<string>>("ReturnSmartAgentConnection", connectionAttributes => ReturnSmartAgentConnection(connectionAttributes));
             await _gatewayHub.StartAsync().ContinueWith(OnConnectionError, TaskContinuationOptions.OnlyOnFaulted);
 
@@ -110,21 +112,26 @@ namespace SmartDataHub
             string hostName = string.Empty;
             string ipAddress = string.Empty;
             bool success;
+            string message;
 
             if (connectionAttributes != null)
             {
                  hostName = connectionAttributes?[0];
                  ipAddress = connectionAttributes?[1];
-                success = true;
+                 success = true;
+
+                 message = String.Format("{0}: {1}", hostName, ipAddress);
             }
             else
             {
                 success = false;
+                message = "no SmartAgents found in network";
             }
            
 
+
           
-            SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("ReturnSmartAgentConnection", hostName, ipAddress, success);
+            SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("Response", success, message, false);
 
         }
 
@@ -154,12 +161,13 @@ namespace SmartDataHub
             //throw new NotImplementedException();
         }
 
-        private static void TestSmartAgentConnectionResponse(bool connectionSuccess)
-        {
+        //private static void TestSmartAgentConnectionResponse(bool success)
+        //{
 
-            _testSmartAgentConnectionTimer.Stop();
-            SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("TestSmartAgentConnectionResponse", connectionSuccess);
-        }
+        //    _testSmartAgentConnectionTimer.Stop();
+        //    var message = "TODO";
+        //    SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("Response", success, message);
+        //}
 
         public static void PublishActualCycleMachineData(Dictionary<string, string> actualCycleMachineData)
         {
@@ -168,7 +176,7 @@ namespace SmartDataHub
                 MachineState = actualCycleMachineData.FirstOrDefault(m => m.Key == "machineState").Value,
                 DailyCycleCounter = actualCycleMachineData.FirstOrDefault(m => m.Key == "dailyCycleCounter").Value,
                 CycleTime = actualCycleMachineData.FirstOrDefault(m => m.Key == "cycleTime").Value,
-                CycleCounterPerMachineState = actualCycleMachineData.FirstOrDefault(m => m.Key == "cycleCounterPerMachineState").Value,
+                CyclesInThisPeriod = actualCycleMachineData.FirstOrDefault(m => m.Key == "cyclesInThisPeriod").Value,
                 StateDuration = actualCycleMachineData.FirstOrDefault(m => m.Key == "stateDuration").Value
             };
 
@@ -205,12 +213,12 @@ namespace SmartDataHub
 
 
 
-        public static void  TestSmartAgentConnection(string ipAddress)
-        {
+        //public static void  TestSmartAgentConnection(string ipAddress)
+        //{
 
-            _testSmartAgentConnectionTimer.Start();
-            _gatewayHub.InvokeAsync("TestSmartAgentConnection", ipAddress);
-        }
+        //    _testSmartAgentConnectionTimer.Start();
+        //    _gatewayHub.InvokeAsync("TestSmartAgentConnection", ipAddress);
+        //}
 
 
         //public static void InizializeNewConfiguration(string ipAddress)
@@ -227,20 +235,6 @@ namespace SmartDataHub
             await  _gatewayHub.InvokeAsync("GetAllSmartAgentConnections");
         }
 
-
-
-        public static void InitializeNewMachineConfigurations()
-        {
-
-
-            if (_gatewayHub != null)
-            {
-                _gatewayHub.InvokeAsync("InitializeNewMachineConfigurations", _cycleMachinesConfigurations);
-            }
-
-
-
-        }
 
 
     }
