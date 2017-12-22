@@ -1920,7 +1920,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     },
     "UAP,Version=v10.0.10240/win10-arm": {
@@ -3699,7 +3702,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     },
     "UAP,Version=v10.0.10240/win10-arm-aot": {
@@ -5441,7 +5447,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     },
     "UAP,Version=v10.0.10240/win10-x64": {
@@ -7227,7 +7236,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     },
     "UAP,Version=v10.0.10240/win10-x64-aot": {
@@ -8969,7 +8981,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     },
     "UAP,Version=v10.0.10240/win10-x86": {
@@ -10755,7 +10770,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     },
     "UAP,Version=v10.0.10240/win10-x86-aot": {
@@ -12497,7 +12515,10 @@
       },
       "MCP23S17/1.0.0": {
         "type": "project",
-        "framework": "Unsupported,Version=v0.0"
+        "framework": "UAP,Version=v10.0.10240",
+        "dependencies": {
+          "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0"
+        }
       }
     }
   },
@@ -15793,7 +15814,7 @@
     },
     "MCP23S17/1.0.0": {
       "type": "project",
-      "path": "../MCP23S17/MCP23S17.csproj",
+      "path": "../MCP23S17/project.json",
       "msbuildProject": "../MCP23S17/MCP23S17.csproj"
     }
   },
@@ -15811,12 +15832,12 @@
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\Users\\Zipfeldieb\\Documents\\Informatik\\GitHub\\SmartAgent\\PiFace\\PIFace Digital II\\PIFace Digital II.csproj",
+      "projectUniqueName": "C:\\Users\\Zipfeldieb\\Desktop\\PIFace Digital II - Kopie\\PIFace Digital II\\PIFace Digital II.csproj",
       "projectName": "PIFace Digital II",
-      "projectPath": "C:\\Users\\Zipfeldieb\\Documents\\Informatik\\GitHub\\SmartAgent\\PiFace\\PIFace Digital II\\PIFace Digital II.csproj",
-      "projectJsonPath": "C:\\Users\\Zipfeldieb\\Documents\\Informatik\\GitHub\\SmartAgent\\PiFace\\PIFace Digital II\\project.json",
+      "projectPath": "C:\\Users\\Zipfeldieb\\Desktop\\PIFace Digital II - Kopie\\PIFace Digital II\\PIFace Digital II.csproj",
+      "projectJsonPath": "C:\\Users\\Zipfeldieb\\Desktop\\PIFace Digital II - Kopie\\PIFace Digital II\\project.json",
       "packagesPath": "C:\\Users\\Zipfeldieb\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Zipfeldieb\\Documents\\Informatik\\GitHub\\SmartAgent\\PiFace\\PIFace Digital II\\obj\\",
+      "outputPath": "C:\\Users\\Zipfeldieb\\Desktop\\PIFace Digital II - Kopie\\PIFace Digital II\\obj\\",
       "projectStyle": "ProjectJson",
       "configFilePaths": [
         "C:\\Users\\Zipfeldieb\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -15829,8 +15850,8 @@
       "frameworks": {
         "uap10.0.10240": {
           "projectReferences": {
-            "C:\\Users\\Zipfeldieb\\Documents\\Informatik\\GitHub\\SmartAgent\\PiFace\\MCP23S17\\MCP23S17.csproj": {
-              "projectPath": "C:\\Users\\Zipfeldieb\\Documents\\Informatik\\GitHub\\SmartAgent\\PiFace\\MCP23S17\\MCP23S17.csproj"
+            "C:\\Users\\Zipfeldieb\\Desktop\\PIFace Digital II - Kopie\\MCP23S17\\MCP23S17.csproj": {
+              "projectPath": "C:\\Users\\Zipfeldieb\\Desktop\\PIFace Digital II - Kopie\\MCP23S17\\MCP23S17.csproj"
             }
           }
         }
@@ -15865,70 +15886,5 @@
         "#import": []
       }
     }
-  },
-  "logs": [
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240) kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240"
-      ]
-    },
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240)/win10-arm kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240/win10-arm"
-      ]
-    },
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240)/win10-arm-aot kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240/win10-arm-aot"
-      ]
-    },
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240)/win10-x64 kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240/win10-x64"
-      ]
-    },
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240)/win10-x64-aot kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240/win10-x64-aot"
-      ]
-    },
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240)/win10-x86 kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240/win10-x86"
-      ]
-    },
-    {
-      "code": "NU1201",
-      "level": "Error",
-      "message": "Das Projekt MCP23S17 ist nicht mit uap10.0.10240 (UAP,Version=v10.0.10240)/win10-x86-aot kompatibel. Das Projekt MCP23S17 unterstützt Folgendes: uap10.0.16299 (UAP,Version=v10.0.16299)",
-      "libraryId": "MCP23S17",
-      "targetGraphs": [
-        "UAP,Version=v10.0.10240/win10-x86-aot"
-      ]
-    }
-  ]
+  }
 }

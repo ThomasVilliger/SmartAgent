@@ -29,6 +29,8 @@ namespace SmartDataHub.Migrations
 
                     b.Property<int>("CycleInputPin");
 
+                    b.Property<int>("MachineId");
+
                     b.Property<string>("MachineName")
                         .IsRequired();
 

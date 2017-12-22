@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.HttpOverrides;
 
 namespace DeviceMonitoring
 {
@@ -52,21 +51,8 @@ builder.AllowAnyOrigin();
 
 
 
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
-
-
-
-
-
-
-
-
-
-            //         app.UseCors(builder =>
-            //builder.WithOrigins("http://localhost:50412"));
+   //         app.UseCors(builder =>
+   //builder.WithOrigins("http://localhost:50412"));
 
             //app.UseCors("AllowSpecificOrigin");
 
@@ -87,7 +73,11 @@ builder.AllowAnyOrigin();
             app.UseStaticFiles();
 
 
-          
+
+
+
+
+
 
 
 
@@ -102,7 +92,6 @@ builder.AllowAnyOrigin();
                 routes.MapHub<MonitoringHub>("MonitoringHub");
 
             });
-
 
 
 

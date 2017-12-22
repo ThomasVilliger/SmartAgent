@@ -41,22 +41,7 @@ namespace PiFace_II
         }
 
 
-        public void SetDeviceInput(int pinNumber, bool state)
-        {
-                if (pinNumber < NumberOfInputs)
-                {
-                    Inputs[pinNumber].State = state;
-                }
-        }
 
-
-        public void SetDeviceOutput(int pinNumber, bool state)
-        {
-                if (pinNumber < NumberOfInputs)
-                {
-                    Outputs[pinNumber].State = state;
-                }
-        }
 
 
         private void initPiFace()
@@ -81,7 +66,12 @@ namespace PiFace_II
             {
 
             }
+
         }
+
+
+
+
     }
 
     public class PiFaceInput : IInput
@@ -114,7 +104,7 @@ namespace PiFace_II
 
    public class PiFaceOutput : IOutput
     {
-        private bool _state;
+        private bool state;
         public int PinNumber { get; }
         public string Name { get; }
         public event Action<IOutput> OutputChanged;
@@ -129,14 +119,16 @@ namespace PiFace_II
         {
             get
             {
-                return _state;
+                return state;
             }
 
             set
             {
-                _state = value;
+                state = value;
                 OutputChanged?.Invoke(this);
             }
-        }     
+        }
+
+        
     }
 }

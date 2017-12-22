@@ -10,7 +10,7 @@ namespace SmartDataHub.Models
         public string MachineState { get; set; }
         public string DailyCycleCounter { get; set; }
         public string CycleTime { get; set; }
-        public string CyclesInThisPeriod { get; set; }
+        public string CycleCounterPerMachineState { get; set; }
         public string StateDuration { get; set; }
 
     }

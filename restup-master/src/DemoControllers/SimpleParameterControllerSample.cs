@@ -15,10 +15,11 @@ using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Collections.Immutable;
 
-
 namespace Restup.DemoControllers
 {
     
+
+
 
     [RestController(InstanceCreationType.Singleton)]
     public sealed class SimpleParameterControllerSample
@@ -55,7 +56,7 @@ namespace Restup.DemoControllers
                 new CurrentMachineData()
                 {
                     MachineState = cycleMachine.CurrentMachineState.ToString(),
-                    CycleCounterPerMachineState = cycleMachine.CyclesInThisPeriod,
+                    CycleCounterPerMachineState = cycleMachine.CycleCounterPerMachineState,
                     DailyCycleCunter = cycleMachine.DailyCycleCounter,
                     LastCycleTime = cycleMachine.LastCycleTime,
                     DurationCurrentMachineState = durationCurrentMachineState.ToString()
@@ -97,77 +98,25 @@ namespace Restup.DemoControllers
                 });
         }
 
-        [UriFormat("/setDeviceInput/")]
-        public IPutResponse SetDeviceInput([FromContent] Dictionary<string, string> parameters)
+        [UriFormat("/writeDeviceInput/{pinNumber}/state/{state}")]
+        public IGetResponse GetWriteDeviceInput(int pinNumber, bool state)
         {
-            int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
-            bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
-
-            _piFaceMain.device.SetDeviceInput(pinNumber, state);
-            return new PutResponse(PutResponse.ResponseStatus.OK);
+            _piFaceMain.WriteDeviceInput(pinNumber, state);
+            return new GetResponse(GetResponse.ResponseStatus.OK);
         }
 
 
-        [UriFormat("/setDeviceOutput/")]
-        public IPutResponse SetDeviceOutput([FromContent] Dictionary<string, string> parameters)
+        [UriFormat("/writeDeviceOutput/{pinNumber}/state/{state}")]
+        public IGetResponse GetWriteDeviceOutput(int pinNumber, bool state)
         {
-
-            int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
-            bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
-
-            _piFaceMain.device.SetDeviceOutput(pinNumber, state);
-            return new PutResponse(PutResponse.ResponseStatus.OK);
-        }
-
-
-
-
-        [UriFormat("/initializeNewMachineConfigurations/")]
-        public IPutResponse InitializeNewMachineConfigurations([FromContent] List<DataStorageLibrary.CycleMachineConfiguration> configuration)
-        //public IPutResponse PutInitializeNewMachineConfigurations()
-        {
-
-            try
-            {
-
-                _piFaceMain.GatewayHubHandler.InitializeNewMachineConfigurations(configuration);
-                return new PutResponse(PutResponse.ResponseStatus.OK, configuration);
-            }
-
-
-            catch(Exception ex)
-            {
-                return new PutResponse(PutResponse.ResponseStatus.NotFound, ex.Message);
-            }
-        }
-
-
-
-        [UriFormat("/initializeNewInputMonitoringConfigurations/")]
-        public IPutResponse InitializeNewInputMonitoringConfigurations([FromContent] List<Dictionary<string, string>> monitoringConfigurations)
-        {
-            _piFaceMain.GatewayHubHandler.InitializeNewInputMonitoringConfigurations(monitoringConfigurations);
-            return new PutResponse(PutResponse.ResponseStatus.OK);
-        }
-
-
-
-
-        [UriFormat("/testSmartAgentConnection/")]
-        public IGetResponse TestSmartAgentConnection()
-        {
+            _piFaceMain.WriteDeviceOutput(pinNumber, state);
             return new GetResponse(GetResponse.ResponseStatus.OK);
         }
 
 
 
 
-
-
-
-
-
-        [UriFormat("/getAllDeviceInputStates/")]
+                    [UriFormat("/getAllDeviceInputStates/")]
         public IGetResponse GetAllDeviceInputStates()
         {
 
@@ -184,6 +133,8 @@ namespace Restup.DemoControllers
 
             }
 
+          
+
             return new GetResponse(GetResponse.ResponseStatus.OK, deviceInputStates);
         }
 
@@ -194,7 +145,9 @@ namespace Restup.DemoControllers
         {
 
             var deviceOutputStates = new Dictionary<string, string>();
+
             int numberOfOutputs = _piFaceMain.device.NumberOfOutputs;
+
             deviceOutputStates.Add("NumberOfOutputs", numberOfOutputs.ToString());
 
 
@@ -203,36 +156,39 @@ namespace Restup.DemoControllers
                 deviceOutputStates.Add(output.PinNumber.ToString(), output.State.ToString());
 
             }
+
+
+
             return new GetResponse(GetResponse.ResponseStatus.OK, deviceOutputStates);
         }
 
 
 
-      //  [UriFormat("/writeDeviceInput/")]
-      //  public IPutResponse PutWriteDeviceInput([FromContent] Dictionary<string, string> parameters)
-      //  {
+        [UriFormat("/writeDeviceInput/")]
+        public IPostResponse WriteDeviceInput([FromContent] Dictionary<string, string> parameters)
+        {
 
-      //      int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
-      //      bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
+            int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
+            bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
 
-      //      _piFaceMain.device.SetDeviceInput(pinNumber, state);
+            _piFaceMain.WriteDeviceInput(pinNumber, state);
 
-      //      return new PutResponse(PutResponse.ResponseStatus.OK);
-      //  }
+            return new PostResponse(PostResponse.ResponseStatus.Created);
+        }
 
 
-      //  [UriFormat("/writeDeviceOutput/")]
-      ////  public IPostResponse writeDeviceOutput([FromContent] Dictionary<string, string> parameters)
-      //      public IPutResponse PutWriteDeviceOutput([FromContent] Dictionary<string, string> parameters)
-      //  {
+        [UriFormat("/writeDeviceOutput/")]
+      //  public IPostResponse writeDeviceOutput([FromContent] Dictionary<string, string> parameters)
+            public IPostResponse WriteDeviceOutput([FromContent] Dictionary<string, string> parameters)
+        {
 
-      //      int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
-      //      bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
+            //int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
+            //bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
 
-      //      _piFaceMain.device.SetDeviceOutput(pinNumber, state);
+            //_piFaceMain.WriteDeviceOutput(pinNumber, state);
 
-      //      return new PutResponse(PutResponse.ResponseStatus.OK);
-      //  }
+            return new PostResponse(PostResponse.ResponseStatus.Created);
+        }
 
 
 

@@ -8,14 +8,14 @@ namespace SmartDataHub.Models
 {
     public class CycleMachineConfiguration
     {
-        [Required] // is also used as the machineId!!!
+        [Required]
         public virtual int CycleMachineConfigurationId { get; set; }
 
         public virtual int SmartAgentId { get; set; }
         [Required]
         public virtual string MachineName { get; set; }
-        //[Required]
-        //public virtual int MachineId { get; set; }
+        [Required]
+        public virtual int MachineId { get; set; }
         [Required]
         public virtual int CycleInputPin { get; set; }
         [Required]

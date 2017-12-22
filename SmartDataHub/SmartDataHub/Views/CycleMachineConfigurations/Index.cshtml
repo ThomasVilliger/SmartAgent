@@ -88,9 +88,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.MachineName)
                 </th>
-                @*<th>
+                <th>
                     @Html.DisplayNameFor(model => model.MachineId)
-                </th>*@
+                </th>
                 <th>
                     @Html.DisplayNameFor(model => model.CycleInputPin)
                 </th>
@@ -117,9 +117,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.MachineName)
             </td>
-            @*<td>
+            <td>
                 @Html.DisplayFor(modelItem => item.MachineId)
-            </td>*@
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CycleInputPin)
             </td>
@@ -133,7 +133,7 @@
                 @Html.DisplayFor(modelItem => item.Active)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SmartAgent.Name)
+                @Html.DisplayFor(modelItem => item.SmartAgent.IpAddress)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.CycleMachineConfigurationId">Edit</a> |

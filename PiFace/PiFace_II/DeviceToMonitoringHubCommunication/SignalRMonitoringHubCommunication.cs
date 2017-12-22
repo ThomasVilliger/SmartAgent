@@ -24,7 +24,6 @@ namespace PiFace_II.DeviceGatewayCommunication
 
         private void NoConnectionToMonitoringHub(ThreadPoolTimer timer)
         {
-            _hub.DisposeAsync();
             EstablishHubConnection();
 
         }
@@ -44,7 +43,7 @@ namespace PiFace_II.DeviceGatewayCommunication
         private async Task EstablishHubConnection()
         {
            
-            string url = @"http://192.168.0.13:59162/MonitoringHub";
+            string url = @"http://localhost:59162/MonitoringHub";
             _hub = new HubConnectionBuilder().WithUrl(url).Build();
             _hub.On<bool>("Heartbeat", p => Heartbeat(p));
           

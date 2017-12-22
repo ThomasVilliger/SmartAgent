@@ -11,8 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR.Client;
 
 using System.Timers;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 
 namespace DeviceMonitoring
 {
@@ -20,12 +18,14 @@ namespace DeviceMonitoring
     {
         private static IHubClients _clients;
         private static Timer _heartbeatTimer = new Timer(3000);
-        private static int _connectionCounter;
-
+        //private static Timer _testConnectionTimer = new Timer(5000);
 
 
         public GatewayHub()
         {
+           
+            //_testConnectionTimer.Elapsed -= noConnectionTestResponse;
+            //_testConnectionTimer.Elapsed += noConnectionTestResponse;
             _heartbeatTimer.Elapsed -= Hearthbeat;
             _heartbeatTimer.Elapsed += Hearthbeat;
             _heartbeatTimer.AutoReset = true;
@@ -50,27 +50,30 @@ namespace DeviceMonitoring
 
 
 
-        public async Task InitializeNewMachineConfigurations(List<Dictionary<string, string>> cycleMachinesConfigurations, string ipAddressOfSmartAgent)
+        public async Task InitializeNewMachineConfigurations(List<Dictionary<string, string>> cycleMachinesConfigurations)
 
         {
-        string connectionId = ConnectionHandler.SmartAgentIpAdressesAndTheirConnections.GetValueOrDefault(ipAddressOfSmartAgent);
-        await Clients.Client(connectionId).InvokeAsync("InitializeNewMachineConfigurations", cycleMachinesConfigurations);
+        await Clients.All.InvokeAsync("InitializeNewMachineConfigurations", cycleMachinesConfigurations);
         }
 
 
 
-        public  async Task TestSmartAgentConnection(string ipAddressOfSmartAgent)
+        public  async Task TestSmartAgentConnection(string ipAddress)
         {
-            string connectionId = ConnectionHandler.SmartAgentIpAdressesAndTheirConnections.GetValueOrDefault("::1");
-            await Clients.Client(connectionId).InvokeAsync("TestSmartAgentConnection", "bla");
 
-            //await Clients.All.InvokeAsync("TestSmartAgentConnection", "bb");
+            //_testConnectionTimer.Start();
+            await Clients.All.InvokeAsync("TestSmartAgentConnection", ipAddress);
         }
 
+        //private void noConnectionTestResponse(object sender, ElapsedEventArgs e)
+        //{
+        //    TestSmartAgentConnectionResponse(false);
+        //}
 
         public async Task TestSmartAgentConnectionResponse(bool success)
 
         {
+            //_testConnectionTimer.Stop();
             await _clients.All.InvokeAsync("TestSmartAgentConnectionResponse", success);
         }
 
@@ -93,46 +96,14 @@ namespace DeviceMonitoring
 
         public override Task OnConnectedAsync()
         {
-            ++_connectionCounter;
-            Console.WriteLine("current Connections on GatewayHub: " + _connectionCounter);
-
             _clients = this.Clients;
-
-            string clientIpAddress = Context.Connection.GetHttpContext().Connection.RemoteIpAddress.ToString();
-            string port = Context.Connection.GetHttpContext().Connection.RemotePort.ToString();
-            string clientConnectionId = Context.ConnectionId;
-
-            //Context.Connection.GetHttpContext().Request.HttpContext.Session.
-
-            //       var ip = 
-
-            
-
-            ConnectionHandler.SmartAgentIpAdressesAndTheirConnections.Remove(clientIpAddress);
-            ConnectionHandler.SmartAgentIpAdressesAndTheirConnections.Add(clientIpAddress, clientConnectionId);
-
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception ex)
         {
-            --_connectionCounter;
-
-            Console.WriteLine("current Connections on GatewayHub: " + _connectionCounter);
-
             _clients = this.Clients;
-            ConnectionHandler.SmartAgentIpAdressesAndTheirConnections.Remove(Context.Connection.GetHttpContext().Connection.RemoteIpAddress.ToString());
             return base.OnDisconnectedAsync(ex);
-        }
-
-
-
-
-
-
-        public static class ConnectionHandler
-        {
-            public static Dictionary<string, string> SmartAgentIpAdressesAndTheirConnections = new Dictionary<string, string>();
         }
     }
 }

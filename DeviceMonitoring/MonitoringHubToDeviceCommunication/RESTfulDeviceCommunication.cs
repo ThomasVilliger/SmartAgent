@@ -24,35 +24,14 @@ namespace DeviceMonitoring
 
         public Task SetDeviceInput(int pinNumber, bool state)
         {
-            var values = new Dictionary<string, string>
-{
-   { "PinNumber", pinNumber.ToString() },
-   { "State", state.ToString() }
-};
-
-            var content = new FormUrlEncodedContent(values);
-          string url = String.Format(@"http://localhost:8800/api/setDeviceInput/");
-
-            return client.PostAsync(url, content);
-
+            string url = String.Format(@"http://localhost:8800/api/writedeviceinput/{0}/state/{1}", pinNumber, state);
+            return client.GetAsync(url);
         }
 
         public Task SetDeviceOutput(int pinNumber, bool state)
         {
-            var values = new Dictionary<string, string>
-{
-   { "PinNumber", pinNumber.ToString() },
-   { "State", state.ToString() }
-};
-
-            var content = new FormUrlEncodedContent(values);
-
-
-            string url = String.Format(@"http://localhost:8800/api/setDeviceOutput/");
-
-            return client.PostAsync(url, content);
-
-
+            string url = String.Format(@"http://localhost:8800/api/writedeviceoutput/{0}/state/{1}", pinNumber, state);
+            return client.GetAsync(url);
         }
 
         public  async Task GetAllInputStates()

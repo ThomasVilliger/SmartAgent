@@ -15,8 +15,7 @@ namespace PiFace_II
         double DeviceVersion { get; }
         List<IInput> Inputs { get; }
         List<IOutput> Outputs { get; }
-        void SetDeviceInput(int pinNumber, bool state);
-        void SetDeviceOutput(int pinNumber, bool state);
+        
 
     }
 
@@ -24,7 +23,7 @@ namespace PiFace_II
     public interface IInput
     {
         string Name { get; }
-        bool State { get;  set; }
+        bool State { get; set; }
         event Action<IInput> InputChanged;
         int PinNumber { get; }
     }
@@ -35,7 +34,7 @@ namespace PiFace_II
     { 
         string Name { get; }
         bool State { get; set; }
-        event Action<IOutput> OutputChanged;
+         event Action<IOutput> OutputChanged;
         int PinNumber { get; }
     }
 }

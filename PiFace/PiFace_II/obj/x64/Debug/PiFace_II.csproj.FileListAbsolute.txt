@@ -40,6 +40,3 @@ C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\obj\
 C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\obj\x64\Debug\qualifiers.txt
 C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\obj\x64\Debug\qualifiers.txt.intermediate
 C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\obj\x64\Debug\MultipleQualifiersPerDimensionFound.txt
-C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\bin\x64\Debug\DataStorageLibrary.dll
-C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\bin\x64\Debug\DataStorageLibrary.pdb
-C:\Users\Zipfeldieb\Documents\Informatik\GitHub\SmartAgent\PiFace\PiFace_II\bin\x64\Debug\DataStorageLibrary.pri
