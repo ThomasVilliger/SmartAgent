@@ -61,7 +61,7 @@ namespace SmartDataHub
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=CycleMachineConfigurations}/{action=Index}/{id?}");
+                    template: "{controller=Machines}/{action=Index}/{id?}");
             });
 
             SmartDataSignalRclient.Initialize();

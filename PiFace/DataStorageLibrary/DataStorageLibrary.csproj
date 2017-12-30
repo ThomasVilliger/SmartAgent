@@ -106,10 +106,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CycleMachineConfiguration.cs" />
-    <Compile Include="DataStorageLibrary.cs" />
+    <Compile Include="MachineCofiguration.cs" />
+    <Compile Include="DataAccess.cs" />
     <Compile Include="InputMonitoringConfiguration.cs" />
-    <Compile Include="MachineStateHistoryEntity.cs" />
+    <Compile Include="MachineStateHistory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\DataStorageLibrary.rd.xml" />
   </ItemGroup>

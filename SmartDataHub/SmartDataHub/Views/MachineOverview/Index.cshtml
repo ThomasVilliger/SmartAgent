@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SmartDataHub.Models.CycleMachineConfiguration>
+﻿@model IEnumerable<SmartDataHub.Models.Machine>
 @{
     ViewData["Title"] = "Index";
 }
@@ -32,7 +32,9 @@
 
             let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
 
-            hubConnection.on('PublishActualCycleMachineData', function (machineId, machineData) {
+            hubConnection.on('PublishActualMachineData', function ( actualMachineData) {
+
+                var machineId = actualMachineData.machineId;
 
                 var idMachineState = "#machineState_" + machineId;
                 var idCycleCounterValue = "#cycleCounterValue_" + machineId;
@@ -40,12 +42,12 @@
                 var idStateDurationValue = "#stateDurationValue_" + machineId;
 
 
-                $(idMachineState).text(machineData.machineState);
-                $(idCycleCounterValue).text(machineData.dailyCycleCounter);
-                $(idCycleTimeValue).text(machineData.cycleTime);
-                $(idStateDurationValue).text(machineData.stateDuration);
+                $(idMachineState).text(actualMachineData.machineState);
+                $(idCycleCounterValue).text(actualMachineData.dailyCycleCounter);
+                $(idCycleTimeValue).text(actualMachineData.lastCycleTime);
+                $(idStateDurationValue).text(actualMachineData.stateDuration);
 
-                if (machineData.machineState == "Running") {
+                if (actualMachineData.machineState == "Running") {
                     $(idMachineState).removeClass("machineStateLabel");
                     $(idMachineState).removeClass("machineStateRunning");
                     $(idMachineState).removeClass("machineStateStopped");
@@ -55,7 +57,7 @@
                 }
 
 
-                else if (machineData.machineState == "Stopped") {
+                else if (actualMachineData.machineState == "Stopped") {
                     $(idMachineState).removeClass("machineStateLabel");
                     $(idMachineState).removeClass("machineStateRunning");
                     $(idMachineState).removeClass("machineStateStopped");
@@ -147,7 +149,7 @@
         <div id="machine-table" class="clear">
             <div class="plan">
                 <h3>@Html.DisplayFor(modelItem => item.MachineName)</h3>
-                <label id="machineState_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="machineStateLabel">Unknown</label>
+                <label id="machineState_@Html.DisplayFor(modelItem => item.MachineId)" class="machineStateLabel">Unknown</label>
 
                 <table>
 
@@ -157,7 +159,7 @@
                             <b>Cycle Counter</b>
                         </td>
 
-                        <td id="cycleCounterValue_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="cycleCounterValue">
+                        <td id="cycleCounterValue_@Html.DisplayFor(modelItem => item.MachineId)" class="cycleCounterValue">
                             -
                         </td>
 
@@ -169,7 +171,7 @@
                             <b>Cycle Time </b>
                         </td>
 
-                        <td id="cycleTimeValue_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="cycleTimeValue">
+                        <td id="cycleTimeValue_@Html.DisplayFor(modelItem => item.MachineId)" class="cycleTimeValue">
                             -
                         </td>
                     </tr>
@@ -180,7 +182,7 @@
                             <b>State Duration </b>
                         </td>
 
-                        <td id="stateDurationValue_@Html.DisplayFor(modelItem => item.CycleMachineConfigurationId)" class="stateDurationValue">
+                        <td id="stateDurationValue_@Html.DisplayFor(modelItem => item.MachineId)" class="stateDurationValue">
                             -
                         </td>
 

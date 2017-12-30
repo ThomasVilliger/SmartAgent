@@ -40,21 +40,25 @@ namespace DeviceMonitoring
             }
         }
 
-        public async Task PublishActualCycleMachineData(Dictionary<string, string> actualCycleMachineData)
+        public async Task PublishActualMachineData(object actualMachineData)
 
         {
-            await Clients.All.InvokeAsync("PublishActualCycleMachineData", actualCycleMachineData);
+            await Clients.All.InvokeAsync("PublishActualMachineData", actualMachineData);
+        }
+
+        public async Task NewHistoryDataNotification(int smartAgentId)
+
+        {
+            await Clients.All.InvokeAsync("NewHistoryDataNotification", smartAgentId);
         }
 
 
 
-
-
-        public async Task InitializeNewMachineConfigurations(List<Dictionary<string, string>> cycleMachinesConfigurations, string ipAddressOfSmartAgent)
+        public async Task InitializeNewMachineConfigurations(List<Dictionary<string, string>> machinesConfigurations, string ipAddressOfSmartAgent)
 
         {
         string connectionId = ConnectionHandler.SmartAgentIpAdressesAndTheirConnections.GetValueOrDefault(ipAddressOfSmartAgent);
-        await Clients.Client(connectionId).InvokeAsync("InitializeNewMachineConfigurations", cycleMachinesConfigurations);
+        await Clients.Client(connectionId).InvokeAsync("InitializeNewMachineConfigurations", machinesConfigurations);
         }
 
 

@@ -10,6 +10,8 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Xml.Serialization;
 using System;
+using DataStorageLibrary;
+using Newtonsoft.Json;
 
 using System.Collections.ObjectModel;
 using System.Net.Http;
@@ -26,7 +28,7 @@ namespace Restup.DemoControllers
 
 
         private  PiFaceMain _piFaceMain { get; set; } 
-      private List<MachineStateHistoryEntity> machineStateHistory;
+      private List<MachineStateHistory> machineStateHistory;
         /// <summary>
         /// Make sure the number of parameters in your UriFormat match the parameters in your method and
         /// the names (case sensitive) and order are respected.
@@ -42,8 +44,8 @@ namespace Restup.DemoControllers
         [UriFormat("/getCurrentMachineData/{machineId}")]
         public IGetResponse GetCurrentMachineData(int machineId)
         {
-            CycleMachine cycleMachine = _piFaceMain.GatewayHubHandler.CycleMachines.FirstOrDefault(m => m.CycleMachineConfiguration.MachineId == machineId);
-            MachineStateHistoryEntity lastMachineStateHistoryEntity = cycleMachine.MachineStateHistory.LastOrDefault();
+            Machine machine = _piFaceMain.GatewayHubHandler.Machines.FirstOrDefault(m => m.MachineConfiguration.MachineId == machineId);
+            MachineStateHistory lastMachineStateHistoryEntity = machine.MachineStateHistory.LastOrDefault();
             TimeSpan durationCurrentMachineState;
             if (lastMachineStateHistoryEntity != null)
             {
@@ -54,10 +56,10 @@ namespace Restup.DemoControllers
                 GetResponse.ResponseStatus.OK,
                 new CurrentMachineData()
                 {
-                    MachineState = cycleMachine.CurrentMachineState.ToString(),
-                    CycleCounterPerMachineState = cycleMachine.CyclesInThisPeriod,
-                    DailyCycleCunter = cycleMachine.DailyCycleCounter,
-                    LastCycleTime = cycleMachine.LastCycleTime,
+                    MachineState = machine.CurrentMachineState.ToString(),
+                    CycleCounterPerMachineState = machine.CyclesInThisPeriod,
+                    DailyCycleCunter = machine.DailyCycleCounter,
+                    LastCycleTime = machine.LastCycleTime,
                     DurationCurrentMachineState = durationCurrentMachineState.ToString()
 
 
@@ -68,7 +70,7 @@ namespace Restup.DemoControllers
         [UriFormat("/getMachineHistory/{machineId}")]
         public IGetResponse GetMachineHistory(int machineId)
         {
-            machineStateHistory = _piFaceMain.GatewayHubHandler.CycleMachines.FirstOrDefault(m=>m.CycleMachineConfiguration.MachineId == machineId).MachineStateHistory;
+            machineStateHistory = _piFaceMain.GatewayHubHandler.Machines.FirstOrDefault(m=>m.MachineConfiguration.MachineId == machineId).MachineStateHistory;
 
             //MemoryStream stream1 = new MemoryStream();
             //DataContractJsonSerializer ser = new DataContractJsonSerializer(typeof(List<MachineStateHistoryEntity>));
@@ -77,7 +79,7 @@ namespace Restup.DemoControllers
             //stream1.Position = 0;
             //string machineHistory = streamReader.ReadToEnd();
 
-              XmlSerializer _xs = new XmlSerializer(typeof(List<MachineStateHistoryEntity>));
+              XmlSerializer _xs = new XmlSerializer(typeof(List<MachineStateHistory>));
 
             MemoryStream fileStream = new MemoryStream();
 
@@ -122,18 +124,15 @@ namespace Restup.DemoControllers
 
 
 
-        [UriFormat("/initializeNewMachineConfigurations/")]
-        public IPutResponse InitializeNewMachineConfigurations([FromContent] List<DataStorageLibrary.CycleMachineConfiguration> configuration)
+        [UriFormat("/initializeNewMachines/")]
+        public IPutResponse InitializeNewMachines([FromContent] List<MachineConfiguration> configs)
         //public IPutResponse PutInitializeNewMachineConfigurations()
         {
-
             try
             {
-
-                _piFaceMain.GatewayHubHandler.InitializeNewMachineConfigurations(configuration);
-                return new PutResponse(PutResponse.ResponseStatus.OK, configuration);
+                DataAccess.MachinesConfigurations(configs);
+                return new PutResponse(PutResponse.ResponseStatus.OK, configs);
             }
-
 
             catch(Exception ex)
             {
@@ -143,11 +142,54 @@ namespace Restup.DemoControllers
 
 
 
-        [UriFormat("/initializeNewInputMonitoringConfigurations/")]
-        public IPutResponse InitializeNewInputMonitoringConfigurations([FromContent] List<Dictionary<string, string>> monitoringConfigurations)
+        [UriFormat("/initializeNewInputMonitorings/")]
+        public IPutResponse InitializeNewInputMonitorings([FromContent] List<InputMonitoringConfiguration> configs)
         {
-            _piFaceMain.GatewayHubHandler.InitializeNewInputMonitoringConfigurations(monitoringConfigurations);
-            return new PutResponse(PutResponse.ResponseStatus.OK);
+            try
+            {
+                DataAccess.StoreInputMonitoringConfigurations(configs);
+                return new PutResponse(PutResponse.ResponseStatus.OK, configs);
+            }
+
+            catch (Exception ex)
+            {
+                return new PutResponse(PutResponse.ResponseStatus.NotFound, ex.Message);
+            }
+        }
+
+
+                [UriFormat("/signSmartAgentAndLoadConfiguration/")]
+        public IPutResponse SignSmartAgent([FromContent] int smartAgentId)
+        {
+            try
+            {
+                DataAccess.SignSmartAgent(smartAgentId);
+                _piFaceMain.GatewayHubHandler.LoadSmartAgentConfiguration();
+                return new PutResponse(PutResponse.ResponseStatus.OK, smartAgentId);
+            }
+
+            catch (Exception ex)
+            {
+                return new PutResponse(PutResponse.ResponseStatus.NotFound, ex.Message);
+            }
+        }
+
+
+        [UriFormat("/getMachineStateHistoryData/{lastHistoryNumber}")]
+        public IGetResponse GetMachineStateHistoryData(int lastHistoryNumber)
+        {
+            try
+            {
+                var historyData = DataAccess.GetMachineStateHistoryData(lastHistoryNumber);
+
+               
+
+                return new GetResponse(GetResponse.ResponseStatus.OK, historyData);
+            }
+            catch(Exception ex)
+            {
+                return new GetResponse(GetResponse.ResponseStatus.NotFound, ex.Message);
+            }
         }
 
 

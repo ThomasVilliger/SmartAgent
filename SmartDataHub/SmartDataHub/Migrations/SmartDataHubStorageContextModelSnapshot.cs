@@ -20,9 +20,32 @@ namespace SmartDataHub.Migrations
                 .HasAnnotation("ProductVersion", "2.0.0-rtm-26452")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("SmartDataHub.Models.CycleMachineConfiguration", b =>
+            modelBuilder.Entity("SmartDataHub.Models.InputMonitoring", b =>
                 {
-                    b.Property<int>("CycleMachineConfigurationId")
+                    b.Property<int>("InputMonitoringId")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Active");
+
+                    b.Property<int>("InputPin");
+
+                    b.Property<string>("MonitoringName")
+                        .IsRequired();
+
+                    b.Property<int>("OutputPin");
+
+                    b.Property<int>("SmartAgentId");
+
+                    b.HasKey("InputMonitoringId");
+
+                    b.HasIndex("SmartAgentId");
+
+                    b.ToTable("InputMonitoring");
+                });
+
+            modelBuilder.Entity("SmartDataHub.Models.Machine", b =>
+                {
+                    b.Property<int>("MachineId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<bool>("Active");
@@ -38,34 +61,39 @@ namespace SmartDataHub.Migrations
 
                     b.Property<int>("SmartAgentId");
 
-                    b.HasKey("CycleMachineConfigurationId");
+                    b.HasKey("MachineId");
 
                     b.HasIndex("SmartAgentId");
 
-                    b.ToTable("CycleMachineConfiguration");
+                    b.ToTable("Machine");
                 });
 
-            modelBuilder.Entity("SmartDataHub.Models.InputMonitoringConfiguration", b =>
+            modelBuilder.Entity("SmartDataHub.Models.MachineStateHistory", b =>
                 {
-                    b.Property<int>("InputMonitoringConfigurationId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<bool>("Active");
+                    b.Property<int>("CyclesInThisPeriod");
 
-                    b.Property<int>("InputPin");
+                    b.Property<int>("DailyCycleCounter");
 
-                    b.Property<string>("MonitoringName")
-                        .IsRequired();
+                    b.Property<TimeSpan>("Duration");
 
-                    b.Property<int>("OutputPin");
+                    b.Property<DateTime>("EndDateTime");
 
-                    b.Property<int>("SmartAgentId");
+                    b.Property<int>("MachineId");
 
-                    b.HasKey("InputMonitoringConfigurationId");
+                    b.Property<int>("MachineState");
 
-                    b.HasIndex("SmartAgentId");
+                    b.Property<int>("SmartAgentHistoryId");
 
-                    b.ToTable("InputMonitoringConfiguration");
+                    b.Property<DateTime>("StartDateTime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MachineId");
+
+                    b.ToTable("MachineStateHistory");
                 });
 
             modelBuilder.Entity("SmartDataHub.Models.SmartAgent", b =>
@@ -76,6 +104,8 @@ namespace SmartDataHub.Migrations
                     b.Property<string>("IpAddress")
                         .IsRequired();
 
+                    b.Property<int>("LastSmartAgentHistoryId");
+
                     b.Property<string>("Name")
                         .IsRequired();
 
@@ -84,7 +114,7 @@ namespace SmartDataHub.Migrations
                     b.ToTable("SmartAgent");
                 });
 
-            modelBuilder.Entity("SmartDataHub.Models.CycleMachineConfiguration", b =>
+            modelBuilder.Entity("SmartDataHub.Models.InputMonitoring", b =>
                 {
                     b.HasOne("SmartDataHub.Models.SmartAgent", "SmartAgent")
                         .WithMany()
@@ -92,11 +122,19 @@ namespace SmartDataHub.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("SmartDataHub.Models.InputMonitoringConfiguration", b =>
+            modelBuilder.Entity("SmartDataHub.Models.Machine", b =>
                 {
                     b.HasOne("SmartDataHub.Models.SmartAgent", "SmartAgent")
                         .WithMany()
                         .HasForeignKey("SmartAgentId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SmartDataHub.Models.MachineStateHistory", b =>
+                {
+                    b.HasOne("SmartDataHub.Models.Machine", "Machine")
+                        .WithMany()
+                        .HasForeignKey("MachineId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618

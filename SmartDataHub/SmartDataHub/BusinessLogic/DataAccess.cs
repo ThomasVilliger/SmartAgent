@@ -3,105 +3,62 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using SmartDataHub.Models;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Runtime.Serialization.Json;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
+using System.Timers;
+using Microsoft.EntityFrameworkCore;
 
 namespace SmartDataHub
 {
     public static class DataAccess
-    {
+    { 
+        private static readonly HttpClient client = new HttpClient();
+        public static DbContextOptions<SmartDataHubStorageContext> DbContextOptions;
 
-        private static string _connectionString = Properties.Resources.DbConnectionString;
-
-
-        public static List<Dictionary<string, string>> GetCycleMachineConfigurations(int smartAgentId)
+        public static List<Machine> GetMachines(int smartAgentId)
         {
-
-            var cycleMachineConfigurations = new List<Dictionary<string, string>>();
-
-          
-
-            using
-            (SqlConnection db = new SqlConnection(_connectionString))
-            {
-
-                db.Open();
-
-
-                SqlCommand givAllCycleMachineConfigs = new SqlCommand();
-                givAllCycleMachineConfigs.Connection = db;
-
-                givAllCycleMachineConfigs.CommandText = String.Format("select *from CycleMachineConfiguration where SmartAgentId={0} and Active='true'", smartAgentId);
-                SqlDataReader reader = givAllCycleMachineConfigs.ExecuteReader();
-
-                try
-                {
-
-                    while (reader.Read())
-                    {
-
-                        cycleMachineConfigurations.Add(new Dictionary<string, string>
-                    {
-                        {   "MachineId", reader["CycleMachineConfigurationId"].ToString() },
-                        {   "MachineName", reader["MachineName"].ToString()},
-                        {   "CycleInputPin", reader["CycleInputPin"].ToString() },
-                        {   "MachineStateTimeout", reader["MachineStateTimeout"].ToString() },
-                        {   "PublishingIntervall", reader["PublishingIntervall"].ToString() }
-
-                });
-
-
-                    }
-
-
-                }
-
-
-                catch (Exception ex)
-                {
-
-                }
-                db.Close();
-                return cycleMachineConfigurations;
-            }
-
-            
+            SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
+            return dbContext.Machine.Where(m => m.SmartAgentId == smartAgentId  && m.Active == true).ToList();
         }
 
 
-
-        public static List<Dictionary<string, string>> GetInputMonitoringConfigurations(int smartAgentId)
+        public static List<InputMonitoring> GetInputMonitorings(int smartAgentId)
         {
+            SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
+            return dbContext.InputMonitoring.Where(m => m.SmartAgentId == smartAgentId).ToList();
+        }
 
-            var monitoringConfigurations = new List<Dictionary<string, string>>();
-            
 
-            using
-           (SqlConnection db = new SqlConnection(_connectionString))
+        public static async Task GetNewHistoryDataFromSmartAgent (int smartAgentId)
+        {       
+           SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
+
+           var smartAgent  = dbContext.SmartAgent.FirstOrDefault(s => s.SmartAgentId == smartAgentId);
+           string ip = smartAgent.IpAddress;
+           string url = String.Format(@"http://{0}:8800/api/getMachineStateHistoryData/{1}", ip, smartAgent.LastSmartAgentHistoryId);
+
+            var response = await client.GetAsync(url);
+            var responseMessage = await response.Content.ReadAsStringAsync(); 
+            var success = response.IsSuccessStatusCode;
+
+            if (success)
             {
+                var historyData = new List<MachineStateHistory>();  
+                historyData = JsonConvert.DeserializeObject<List<MachineStateHistory>>(responseMessage);
+                historyData.OrderBy(h => h.SmartAgentHistoryId);
 
-                db.Open();
-
-
-                SqlCommand givAllMonitoringConfigs = new SqlCommand();
-                givAllMonitoringConfigs.Connection = db;
-
-                givAllMonitoringConfigs.CommandText = String.Format("select *from InputMonitoringConfiguration where SmartAgentId={0} and Active='true'", smartAgentId);
-                SqlDataReader reader = givAllMonitoringConfigs.ExecuteReader();
-
-
-                while (reader.Read())
+                foreach (MachineStateHistory m in historyData)
                 {
-
-                        monitoringConfigurations.Add(new Dictionary<string, string>
-                    {
-                        {   "InputPin", reader["InputPin"].ToString() },
-                        {   "OutputPin", reader["OutputPin"].ToString()}
-
-                });
-
+                    m.Duration = m.EndDateTime - m.StartDateTime;
                 }
-                db.Close();
-                return monitoringConfigurations;
 
+                dbContext.MachineStateHistory.AddRange(historyData);       
+                smartAgent.LastSmartAgentHistoryId = historyData.Last().SmartAgentHistoryId;
+                dbContext.SaveChanges();
             }
         }
     }

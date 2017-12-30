@@ -14,75 +14,68 @@ namespace SmartDataHub
 {
     public class SmartDataSignalRhub : Hub
     {
-        private static readonly HttpClient client = new HttpClient();
-      
-        private  Timer _responseTimer = new Timer(4000);
-
+        private static readonly HttpClient client = new HttpClient();   
         public  static IHubClients  SmartDataHubClients;
 
-        public SmartDataSignalRhub()
-        {
-
-            _responseTimer.Elapsed -= responseTimeOut;
-            _responseTimer.Elapsed += responseTimeOut;
-            _responseTimer.AutoReset = false;
-
-        }
-
-        private void responseTimeOut(object sender, ElapsedEventArgs e)
-        {
-            Clients.All.InvokeAsync("Response",  false, "response TimeOut", false);
-        }
 
         public async Task TestSmartAgentConnection(string ip)
         {
-            string url = String.Format(@"http://{0}:8800/api/testSmartAgentConnection", ip);
-
-            _responseTimer.Start();
-
-            var response = await client.GetAsync(url);
-            _responseTimer.Stop();
-            var responseMessage = await response.Content.ReadAsStringAsync(); 
-            var success = response.IsSuccessStatusCode;
-
-            if (success)
+            try
             {
-                var successMessage = String.Format("Connection to {0} successfull", ip);
+                string url = String.Format(@"http://{0}:8800/api/testSmartAgentConnection", ip);
+                var response = await client.GetAsync(url);
+                var responseMessage = await response.Content.ReadAsStringAsync();
+                var success = response.IsSuccessStatusCode;
 
-                Clients.All.InvokeAsync("Response", success, successMessage, true);
-               
+                if (success)
+                {
+                    var message = String.Format("Connection to {0} successfull", ip);
+                    SmartAgentConfigurationResponse(true, message, null, true);
+                }
+                else
+                {         
+                      var  message =  responseMessage;
+                      var defaultMessage = "connection test failed";
+                      SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+                }
             }
-            else
+
+            catch (Exception ex)
             {
-                var errorMessage = Environment.NewLine +  JsonConvert.SerializeObject(responseMessage);
-                Clients.All.InvokeAsync("Response", success, errorMessage, false);
+                SmartAgentConfigurationResponse(false, ex.Message, null, false);
+            }
+        }
+
+
+        public async void InitializeSmartAgentConfigurations(string ip, int smartAgentId)
+        {
+            try
+            {
+                await InitializeMachinesOnSmartAgent(ip, smartAgentId);
+                await InitializeInputMonitoringsOnSmartAgent(ip, smartAgentId);
+                await SignSmartAgent(ip, smartAgentId);
+            }
+
+            catch (Exception ex)
+            {
+                SmartAgentConfigurationResponse(false, "Initialization failed", null, false);
+                SmartAgentConfigurationResponse(false, ex.Message, null, false);
             }
         }
 
 
 
-        public async Task GetAllSmartAgentConnections()
+        private async  Task InitializeMachinesOnSmartAgent(string ip, int smartAgentId)
         {
-            SmartDataSignalRclient.GetAllSmartAgentConnections();
-        }
-
-
-
-        public async Task InitializeNewMachineConfigurations(string ip, int smartAgentId)
-        {
-            var values = DataAccess.GetCycleMachineConfigurations(smartAgentId);
+            var values = DataAccess.GetMachines(smartAgentId);
             //var content = new FormUrlEncodedContent(values);
-
-            var jsonContent= JsonConvert.SerializeObject(values);
+            var jsonContent = JsonConvert.SerializeObject(values);
             var stringContent = new StringContent(jsonContent.ToString());
 
             //stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-      
-            string url = String.Format(@"http://{0}:8800/api/initializeNewMachineConfigurations", ip);
 
-            _responseTimer.Start();
+            string url = String.Format(@"http://{0}:8800/api/initializeNewMachines", ip);
             var response = await client.PutAsync(url, stringContent);
-            _responseTimer.Stop();
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
@@ -90,29 +83,101 @@ namespace SmartDataHub
 
             if (success)
             {
-              var successMessage = String.Format("SmartAgent {0} successfully configured", ip) ;
-              var configuredMachines = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
+                var message = String.Format("Machine configs  successfully written to {0}", ip);
+                var configuredMachines = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
+                var defaultMessage = "no machines configured for this SmartAgent";
 
-              await  Clients.All.InvokeAsync("Response", success, successMessage, true);
-                Clients.All.InvokeAsync("Response",  success, configuredMachines, false);
+                SmartAgentConfigurationResponse(true, message, null, true);
+                SmartAgentConfigurationResponse(true, configuredMachines, defaultMessage, false);
+            }
+
+           else
+           {
+                var message = responseMessage;
+                var defaultMessage = "Failed to write down machine configurations on SmartAgent";
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+            }
+        }
+
+        private async Task InitializeInputMonitoringsOnSmartAgent(string ip, int smartAgentId)
+        {
+            var values = DataAccess.GetInputMonitorings(smartAgentId);
+            var jsonContent = JsonConvert.SerializeObject(values);
+            var stringContent = new StringContent(jsonContent.ToString());
+
+            string url = String.Format(@"http://{0}:8800/api/initializeNewInputMonitorings", ip);
+            var response = await client.PutAsync(url, stringContent);
+            var responseMessage = await response.Content.ReadAsStringAsync(); //right!
+            var success = response.IsSuccessStatusCode;
+
+            if (success)
+            {
+                var message = String.Format("Input monitoring configs  successfully written to {0}", ip);
+                var configuredInputMonitorings = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
+                var defaultMessage = "no input Monitorings configured for this SmartAgent";
+
+                SmartAgentConfigurationResponse(true, message, null, true);
+                SmartAgentConfigurationResponse(true, configuredInputMonitorings, defaultMessage, false);
+            }
+
+            else
+           {
+                var message = responseMessage;
+                var defaultMessage = "Failed to write down inputMonitoring configurations on SmartAgent";
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+            }
+        }
+
+        private async Task SignSmartAgent(string ip, int smartAgentId)
+        {
+            var values = smartAgentId;
+            var jsonContent = JsonConvert.SerializeObject(values);
+            var stringContent = new StringContent(jsonContent.ToString());
+
+            string url = String.Format(@"http://{0}:8800/api/signSmartAgentAndLoadConfiguration", ip);
+            var response = await client.PutAsync(url, stringContent);
+            var responseMessage = await response.Content.ReadAsStringAsync(); //right!
+            var success = response.IsSuccessStatusCode;
+
+            if (success)
+            {
+                var message = String.Format("SmartAgent successfully signed with Id {0} and running with new configuration", smartAgentId);
+                SmartAgentConfigurationResponse(true, message, null, true);
             }
             else
             {
-                var errorMessage = Environment.NewLine + responseMessage;
-                Clients.All.InvokeAsync("Response", success, errorMessage, false);
-            }      
+                var message = responseMessage;
+                var defaultMessage = "Failed to sign SmartAgent";
+
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+            }
         }
 
 
+        public static void SmartAgentConfigurationResponse(bool isSuccess, string message, string defaultMessage, bool isGreenColored)
+        {
+            string responseMessage;
 
+            if (message != String.Empty)
+            {
+                responseMessage = message;
+            }
+            else
+            {
+                responseMessage = defaultMessage;
+            }
 
+            SmartDataHubClients.All.InvokeAsync("SmartAgentConfigurationResponse", isSuccess, responseMessage, isGreenColored);
+        }
 
+        public async Task GetAllSmartAgentConnections()
+        {
+            SmartDataSignalRclient.GetAllSmartAgentConnections();
+        }
 
         public override Task OnConnectedAsync()
         {
             SmartDataHubClients = this.Clients;
-
-
             return base.OnConnectedAsync();
         }
 
@@ -123,3 +188,4 @@ namespace SmartDataHub
         }
     }
 }
+

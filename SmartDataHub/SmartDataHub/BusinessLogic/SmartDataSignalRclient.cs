@@ -16,7 +16,7 @@ namespace SmartDataHub
     public static class SmartDataSignalRclient
     {
 
-        private static List<Dictionary<string, string>> _cycleMachinesConfigurations = new List<Dictionary<string, string>>();
+        private static List<Dictionary<string, string>> _machines = new List<Dictionary<string, string>>();
         
       
         private static HubConnection _gatewayHub;
@@ -24,29 +24,29 @@ namespace SmartDataHub
         //private static Timer _testSmartAgentConnectionTimer = new Timer(3000);
         private static Timer _broadcastAllSmargAgentsTimer = new Timer(3000);
 
-        public static DbSet<CycleMachineConfiguration> _cycleMachineConfigurationContext {
+        //public static DbSet<CycleMachineConfiguration> _cycleMachineConfigurationContext {
 
 
-                set
+        //        set
 
-            {
-                _cycleMachinesConfigurations.Clear();
-                foreach (CycleMachineConfiguration c in value)
-                {
-                    _cycleMachinesConfigurations.Add(new Dictionary<string, string>
-                {
-                    {"MachineName", c.MachineName },
-                    {"MachineId", c.CycleMachineConfigurationId.ToString() },
-                    {"CycleInputPin", c.CycleInputPin.ToString() },
-                    {"MachineStateTimeOut", c.MachineStateTimeOut.ToString() },
-                    {"PublishingIntervall", c.PublishingIntervall.ToString() }
-                }
-                        );
-                }
-            }
+        //    {
+        //        _cycleMachinesConfigurations.Clear();
+        //        foreach (CycleMachineConfiguration c in value)
+        //        {
+        //            _cycleMachinesConfigurations.Add(new Dictionary<string, string>
+        //        {
+        //            {"MachineName", c.MachineName },
+        //            {"MachineId", c.CycleMachineConfigurationId.ToString() },
+        //            {"CycleInputPin", c.CycleInputPin.ToString() },
+        //            {"MachineStateTimeOut", c.MachineStateTimeOut.ToString() },
+        //            {"PublishingIntervall", c.PublishingIntervall.ToString() }
+        //        }
+        //                );
+        //        }
+        //    }
 
            
-         }
+        // }
 
 
 
@@ -93,15 +93,22 @@ namespace SmartDataHub
             string url = @"http://192.168.0.13:59162/GatewayHub";
             _gatewayHub = new HubConnectionBuilder().WithUrl(url).Build();
 
-            _gatewayHub.On<Dictionary<string, string>>("PublishActualCycleMachineData", actualCycleMachineData => PublishActualCycleMachineData(actualCycleMachineData));
+            _gatewayHub.On<ActualMachineData>("PublishActualMachineData", actualMachineData => PublishActualMachineData(actualMachineData));
 
             _gatewayHub.On<bool>("Heartbeat", p => GatewayHubHeartbeat(p));
             //_gatewayHub.On<bool>("TestSmartAgentConnectionResponse", connectionSuccess => TestSmartAgentConnectionResponse(connectionSuccess));
             _gatewayHub.On<List<string>>("ReturnSmartAgentConnection", connectionAttributes => ReturnSmartAgentConnection(connectionAttributes));
+            
+                _gatewayHub.On<int>("NewHistoryDataNotification", smartAgentId => RequestNewHistoryData(smartAgentId));
             await _gatewayHub.StartAsync().ContinueWith(OnConnectionError, TaskContinuationOptions.OnlyOnFaulted);
 
             //_gatewayHub.InvokeAsync("TestSmartAgentConnection", "I'm_a_IP_You_know?");
 
+        }
+
+        private static void RequestNewHistoryData(int smartAgentId)
+        {
+            DataAccess.GetNewHistoryDataFromSmartAgent(smartAgentId);
         }
 
         private static void ReturnSmartAgentConnection(List<string> connectionAttributes)
@@ -130,8 +137,7 @@ namespace SmartDataHub
            
 
 
-          
-            SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("Response", success, message, false);
+            SmartDataSignalRhub.SmartAgentConfigurationResponse(success, message, null, false);
 
         }
 
@@ -169,44 +175,25 @@ namespace SmartDataHub
         //    SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("Response", success, message);
         //}
 
-        public static void PublishActualCycleMachineData(Dictionary<string, string> actualCycleMachineData)
+        public static void PublishActualMachineData(ActualMachineData actualMachineData)
         {
-            ActualCycleMachineData machineData = new ActualCycleMachineData
-            {
-                MachineState = actualCycleMachineData.FirstOrDefault(m => m.Key == "machineState").Value,
-                DailyCycleCounter = actualCycleMachineData.FirstOrDefault(m => m.Key == "dailyCycleCounter").Value,
-                CycleTime = actualCycleMachineData.FirstOrDefault(m => m.Key == "cycleTime").Value,
-                CyclesInThisPeriod = actualCycleMachineData.FirstOrDefault(m => m.Key == "cyclesInThisPeriod").Value,
-                StateDuration = actualCycleMachineData.FirstOrDefault(m => m.Key == "stateDuration").Value
-            };
-
-            int machineId = Convert.ToInt32(actualCycleMachineData.FirstOrDefault(m => m.Key == "machineId").Value);
-
-            //int machineId = 999;
-            //var machineData = new Dictionary<string, string>
+            //ActualMachineData machineData = new ActualMachineData
             //{
-            //    { "MachineState", "Running" },
-            //    { "DailyCycleCounter", "666" },
-            //    { "StateDuration", "17h 55min" },
-            //     { "CycleTime", "7.83s" },
+            //    MachineState = actualMachineData.FirstOrDefault(m => m.Key == "machineState").Value,
+            //    DailyCycleCounter = actualMachineData.FirstOrDefault(m => m.Key == "dailyCycleCounter").Value,
+            //    CycleTime = actualMachineData.FirstOrDefault(m => m.Key == "cycleTime").Value,
+            //    CyclesInThisPeriod = actualMachineData.FirstOrDefault(m => m.Key == "cyclesInThisPeriod").Value,
+            //    StateDuration = actualMachineData.FirstOrDefault(m => m.Key == "stateDuration").Value
+            //};
+
+            //int machineId = Convert.ToInt32(actualMachineData.FirstOrDefault(m => m.Key == "machineId").Value);
 
 
-        //};
+         
+                SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("PublishActualMachineData", actualMachineData);
+        
 
-            try
-            {
-                SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("PublishActualCycleMachineData", machineId, machineData);
-
-
-
-
-            }
-
-            catch (Exception)
-            {
-              
-             
-            }
+    
         }
 
 

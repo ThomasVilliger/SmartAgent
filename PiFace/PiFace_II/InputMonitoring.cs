@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.System.Threading;
 using Windows.UI.Xaml;
+using DataStorageLibrary;
 
 namespace PiFace_II
 {
@@ -17,19 +18,21 @@ namespace PiFace_II
 
         private ThreadPoolTimer timerCycleTimeOut1;
         private ThreadPoolTimer timerCycleTimeOut2;
+        private IDevice _device;
 
         
 
         public InputMonitoring(IDevice device, InputMonitoringConfiguration inputSignalMonitoringConfiguration)
         {
+            _device = device;
             config = inputSignalMonitoringConfiguration;
 
-            device.Inputs[config.InputPin].InputChanged += InputInterpretation;
+            _device.Inputs[config.InputPin].InputChanged += InputInterpretation;
 
-            output = device.Outputs[config.OutputPin];
+            output = _device.Outputs[config.OutputPin];
 
    
-            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
+            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(machineNotAlive,
                                        TimeSpan.FromHours(24));
 
             timerCycleTimeOut2 = ThreadPoolTimer.CreatePeriodicTimer(reciveNoCycles,
@@ -38,12 +41,12 @@ namespace PiFace_II
         }
 
 
-        private void cycleMachineNotAlive(ThreadPoolTimer timer)
+        private void machineNotAlive(ThreadPoolTimer timer)
         {
             sendEmailToSpecifiedAdressList();
 
             timerCycleTimeOut1.Cancel();
-            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
+            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(machineNotAlive,
                                         TimeSpan.FromHours(24));
         }
 
@@ -67,13 +70,21 @@ namespace PiFace_II
                                         TimeSpan.FromSeconds(15));
 
             timerCycleTimeOut1.Cancel();
-            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(cycleMachineNotAlive,
+            timerCycleTimeOut1 = ThreadPoolTimer.CreatePeriodicTimer(machineNotAlive,
                                         TimeSpan.FromHours(24));
         }
 
         private void setOutput(bool outputValue)
         {
             output.State = outputValue;
+        }
+
+
+        public void StopInputMonitoring()
+        {
+            _device.Inputs[config.InputPin].InputChanged -= InputInterpretation;
+            timerCycleTimeOut1.Cancel();
+            timerCycleTimeOut2.Cancel();
         }
 
             private void sendEmailToSpecifiedAdressList()

@@ -21,7 +21,7 @@ namespace SmartDataHub.Controllers
         // GET: MachineOverview
         public async Task<IActionResult> Index()
         {
-            var smartDataHubStorageContext = _context.CycleMachineConfiguration.Include(c => c.SmartAgent);
+            var smartDataHubStorageContext = _context.Machine.Include(c => c.SmartAgent);
             return View(await smartDataHubStorageContext.ToListAsync());
         }
 
@@ -33,21 +33,21 @@ namespace SmartDataHub.Controllers
                 return NotFound();
             }
 
-            var cycleMachineConfiguration = await _context.CycleMachineConfiguration
+            var machine = await _context.Machine
                 .Include(c => c.SmartAgent)
-                .SingleOrDefaultAsync(m => m.CycleMachineConfigurationId == id);
-            if (cycleMachineConfiguration == null)
+                .SingleOrDefaultAsync(m => m.MachineId == id);
+            if (machine == null)
             {
                 return NotFound();
             }
 
-            return View(cycleMachineConfiguration);
+            return View(machine);
         }
 
         // GET: MachineOverview/Create
         public IActionResult Create()
         {
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress");
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name");
             return View();
         }
 
@@ -56,16 +56,16 @@ namespace SmartDataHub.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("CycleMachineConfigurationId,SmartAgentId,MachineName,MachineId,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] CycleMachineConfiguration cycleMachineConfiguration)
+        public async Task<IActionResult> Create([Bind("MachineId,SmartAgentId,MachineName,MachineId,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] Machine machine)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cycleMachineConfiguration);
+                _context.Add(machine);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", cycleMachineConfiguration.SmartAgentId);
-            return View(cycleMachineConfiguration);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", machine.SmartAgentId);
+            return View(machine);
         }
 
         // GET: MachineOverview/Edit/5
@@ -76,13 +76,13 @@ namespace SmartDataHub.Controllers
                 return NotFound();
             }
 
-            var cycleMachineConfiguration = await _context.CycleMachineConfiguration.SingleOrDefaultAsync(m => m.CycleMachineConfigurationId == id);
-            if (cycleMachineConfiguration == null)
+            var machine = await _context.Machine.SingleOrDefaultAsync(m => m.MachineId == id);
+            if (machine == null)
             {
                 return NotFound();
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", cycleMachineConfiguration.SmartAgentId);
-            return View(cycleMachineConfiguration);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", machine.SmartAgentId);
+            return View(machine);
         }
 
         // POST: MachineOverview/Edit/5
@@ -90,9 +90,9 @@ namespace SmartDataHub.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("CycleMachineConfigurationId,SmartAgentId,MachineName,MachineId,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] CycleMachineConfiguration cycleMachineConfiguration)
+        public async Task<IActionResult> Edit(int id, [Bind("MachineId,SmartAgentId,MachineName,MachineId,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] Machine machine)
         {
-            if (id != cycleMachineConfiguration.CycleMachineConfigurationId)
+            if (id != machine.MachineId)
             {
                 return NotFound();
             }
@@ -101,12 +101,12 @@ namespace SmartDataHub.Controllers
             {
                 try
                 {
-                    _context.Update(cycleMachineConfiguration);
+                    _context.Update(machine);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CycleMachineConfigurationExists(cycleMachineConfiguration.CycleMachineConfigurationId))
+                    if (!MachineExists(machine.MachineId))
                     {
                         return NotFound();
                     }
@@ -117,8 +117,8 @@ namespace SmartDataHub.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", cycleMachineConfiguration.SmartAgentId);
-            return View(cycleMachineConfiguration);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", machine.SmartAgentId);
+            return View(machine);
         }
 
         // GET: MachineOverview/Delete/5
@@ -129,15 +129,15 @@ namespace SmartDataHub.Controllers
                 return NotFound();
             }
 
-            var cycleMachineConfiguration = await _context.CycleMachineConfiguration
+            var machine = await _context.Machine
                 .Include(c => c.SmartAgent)
-                .SingleOrDefaultAsync(m => m.CycleMachineConfigurationId == id);
-            if (cycleMachineConfiguration == null)
+                .SingleOrDefaultAsync(m => m.MachineId == id);
+            if (machine == null)
             {
                 return NotFound();
             }
 
-            return View(cycleMachineConfiguration);
+            return View(machine);
         }
 
         // POST: MachineOverview/Delete/5
@@ -145,15 +145,15 @@ namespace SmartDataHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cycleMachineConfiguration = await _context.CycleMachineConfiguration.SingleOrDefaultAsync(m => m.CycleMachineConfigurationId == id);
-            _context.CycleMachineConfiguration.Remove(cycleMachineConfiguration);
+            var machine = await _context.Machine.SingleOrDefaultAsync(m => m.MachineId == id);
+            _context.Machine.Remove(machine);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CycleMachineConfigurationExists(int id)
+        private bool MachineExists(int id)
         {
-            return _context.CycleMachineConfiguration.Any(e => e.CycleMachineConfigurationId == id);
+            return _context.Machine.Any(e => e.MachineId == id);
         }
     }
 }

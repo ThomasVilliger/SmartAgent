@@ -13,13 +13,15 @@ namespace SmartDataHub.Models
         public SmartDataHubStorageContext (DbContextOptions<SmartDataHubStorageContext> options)
             : base(options)
         {
-            //SmartDataSignalRclient._cycleMachineConfigurationContext = CycleMachineConfiguration;
+            DataAccess.DbContextOptions = options;
         }
 
-        public DbSet<SmartDataHub.Models.CycleMachineConfiguration> CycleMachineConfiguration { get; set; }
+        public DbSet<SmartDataHub.Models.Machine> Machine { get; set; }
 
         public DbSet<SmartDataHub.Models.SmartAgent> SmartAgent { get; set; }
 
-        public DbSet<SmartDataHub.Models.InputMonitoringConfiguration> InputMonitoringConfiguration { get; set; }
+        public DbSet<SmartDataHub.Models.InputMonitoring> InputMonitoring { get; set; }
+
+        public DbSet<SmartDataHub.Models.MachineStateHistory> MachineStateHistory { get; set; }
     }
 }

@@ -48,7 +48,7 @@ namespace PiFace_II.DeviceGatewayCommunication
             _hub = new HubConnectionBuilder().WithUrl(url).Build();
             _hub.On<bool>("Heartbeat", p => Heartbeat(p));
           
-            await _hub.StartAsync();
+             _hub.StartAsync();
         }
 
         private void Heartbeat(bool p)

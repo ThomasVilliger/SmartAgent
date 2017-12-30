@@ -21,7 +21,7 @@ namespace PiFace_II
 
         public  PiFaceMain()
         {
-            DataStorageLibrary.DataStorageLibrary.InitializeDatabase();
+            DataAccess.InitializeDatabase();
             chooseDevice();
            
             GatewayHubHandler = new GatewayHubHandler(device);

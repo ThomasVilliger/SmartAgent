@@ -96,11 +96,16 @@ namespace DeviceMonitoring
         {
             _clients = this.Clients;
 
-          
 
-            ConnectionCounter.ConnectedIds.Add(Context.ConnectionId);
-            _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
-
+            try
+            {
+                ConnectionCounter.ConnectedIds.Add(Context.ConnectionId);
+                _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
+            }
+            catch(Exception ex)
+            {
+                this.Context.Connection.Abort();
+            }
             GetAllInputStates();
             GetAllOutputStates();
             return base.OnConnectedAsync();

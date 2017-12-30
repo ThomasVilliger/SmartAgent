@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.System.Threading;
+using DataStorageLibrary;
 
 namespace PiFace_II
 {
@@ -15,10 +16,11 @@ namespace PiFace_II
 
 
         private HubConnection _hub;
-        public List<CycleMachine> CycleMachines;
+        public List<Machine> Machines;
         public List<InputMonitoring> InputMonitorings;
         public IDevice Device;
         private  ThreadPoolTimer _heartbeatWatchdog;
+        private int _smartAgentId;
 
 
         public GatewayHubHandler(IDevice device)
@@ -28,7 +30,7 @@ namespace PiFace_II
             _heartbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToGatewayHub,
                                    TimeSpan.FromMilliseconds(10000));
 
-            CycleMachines = new List<CycleMachine>();
+            Machines = new List<Machine>();
 
             
 
@@ -37,49 +39,43 @@ namespace PiFace_II
             EstablishHubConnection();
 
 
-            loadMachineConfiguration();
+            LoadSmartAgentConfiguration();
         }
 
 
 
-        private void loadMachineConfiguration()
+        public void LoadSmartAgentConfiguration()
         {
 
-            foreach(CycleMachine c in CycleMachines)
+           //var  historyData = DataAccess.GetMachineStateHistoryData(0);
+
+            foreach(Machine c in Machines)
             {
                 c.StopMachineDataGeneration();
             }
 
-            CycleMachines.Clear();
+            _smartAgentId = DataAccess.GetSmartAgentId();
+
+            Machines.Clear();
           
-            var cycleMachineConfigurations = DataStorageLibrary.DataStorageLibrary.GetCycleMachineConfigurations();
-            foreach (Dictionary<string, string> machineConfig in cycleMachineConfigurations)
+            var machineConfigurations = DataAccess.GetMachineConfigurations();
+            foreach (MachineConfiguration config in machineConfigurations)
             {
-                var config = new CycleMachineConfiguration
-                {
-                    MachineName = machineConfig.FirstOrDefault(c => c.Key == "MachineName").Value,
-                    MachineId = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "MachineId").Value),
-                    CycleInputPin = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "CycleInputPin").Value),
-                    MachineStateTimeOut = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "MachineStateTimeout").Value),
-                    PublishingIntervall = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "PublishingIntervall").Value)
-                };
-                CycleMachines.Add(new CycleMachine(Device, this, config));
+                Machines.Add(new Machine(Device, this, config));
             }
 
-
-
-            var inputMonitoringConfigurations = DataStorageLibrary.DataStorageLibrary.GetInputMonitoringConfigurations();
-            foreach (Dictionary<string, string> monitoringConfig in inputMonitoringConfigurations)
-
+            foreach (InputMonitoring m in InputMonitorings)
             {
-                var config = new InputMonitoringConfiguration
-                {
-                    InputPin = Convert.ToInt32(monitoringConfig.FirstOrDefault(c => c.Key == "InputPin").Value),
-                    OutputPin = Convert.ToInt32(monitoringConfig.FirstOrDefault(c => c.Key == "OutputPin").Value),
-                };
+                m.StopInputMonitoring();
+            }
 
+            InputMonitorings.Clear();
+
+            var inputMonitoringConfigurations = DataAccess.GetInputMonitoringConfigurations();
+            foreach (InputMonitoringConfiguration config in inputMonitoringConfigurations)
+            {
                 InputMonitorings.Add(new InputMonitoring(Device, config));
-            }
+            }       
         }
 
 
@@ -115,7 +111,7 @@ namespace PiFace_II
                                   TimeSpan.FromMilliseconds(10000));
         }
 
-        private void GetAllSmartAgentConnections(bool p)
+        private   void  GetAllSmartAgentConnections(bool p)
         {
             string hostName = Dns.GetHostName();
             IPHostEntry hostInfo = Dns.GetHostEntry(hostName);
@@ -135,83 +131,38 @@ namespace PiFace_II
         }
 
 
-        public void InitializeNewMachineConfigurations(List<DataStorageLibrary.CycleMachineConfiguration> cycleMachinesConfigurations)
+        public void InitializeNewMachineConfigurations(List<MachineConfiguration> machinesConfigurations)
         {
-
-            // CycleMachines.Clear();
-
-            //foreach (DataStorageLibrary.CycleMachineConfiguration machineConfig in cycleMachinesConfigurations)
-            //{
-            //    CycleMachines.Add(new CycleMachine(Device, this, machineConfig));
-            //}
+           DataAccess.MachinesConfigurations(machinesConfigurations);     
+        }
 
 
-
-            DataStorageLibrary.DataStorageLibrary.StoreCycleMachineConfigurations(cycleMachinesConfigurations);
-
-            loadMachineConfiguration();
+        public void InitializeNewInputMonitoringConfigurations(List<InputMonitoringConfiguration> inputMonitoringConfigurations)
+        {
+            DataAccess.StoreInputMonitoringConfigurations(inputMonitoringConfigurations);
+            LoadSmartAgentConfiguration();
         }
 
 
 
-        public void InitializeNewMachineConfigurations(StringContent configuration)
+        public void NewHistoryDataNotification()
         {
-            CycleMachines.Clear();
-
-            //foreach (Dictionary<string, string> machineConfig in cycleMachinesConfigurations)
-            //{
-
-            //    var config = new CycleMachineConfiguration
-            //    {
-            //        MachineName = machineConfig.FirstOrDefault(c => c.Key == "MachineName").Value,
-            //        MachineId = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "MachineId").Value),
-            //        CycleInputPin = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "CycleInputPin").Value),
-            //        MachineStateTimeOut = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "MachineStateTimeOut").Value),
-            //        PublishingIntervall = Convert.ToInt32(machineConfig.FirstOrDefault(c => c.Key == "PublishingIntervall").Value)
-            //    };
-
-            //    CycleMachines.Add(new CycleMachine(Device, this, config));
-            //}
-
-            //DataStorageLibrary.DataStorageLibrary.StoreCycleMachineConfigurations(cycleMachinesConfigurations);
+            _hub.InvokeAsync("NewHistoryDataNotification", _smartAgentId);
         }
 
-
-
-
-
-
-
-        public void InitializeNewInputMonitoringConfigurations(List<Dictionary<string, string>> inputMonitoringConfigurations)
-        {
-            InputMonitorings.Clear();
-            foreach (Dictionary<string, string> monitoringConfig in inputMonitoringConfigurations)
+        public void PublishActualMachineData(Machine machine)
+        {   
+            ActualMachineData actualMachineData = new ActualMachineData
             {
+                MachineState = machine.CurrentMachineState.ToString(),
+                DailyCycleCounter = machine.DailyCycleCounter,
+                LastCycleTime  = machine.LastCycleTime,
+                CyclesInThisPeriod = machine.CyclesInThisPeriod,
+                MachineId = machine.MachineConfiguration.MachineId,
+                StateDuration = machine.StateDuration.ToString(@"dd\.hh\:mm\:ss")
+            };
 
-                var config = new InputMonitoringConfiguration
-                {
-                    InputPin = Convert.ToInt32(monitoringConfig.FirstOrDefault(c => c.Key == "InputPin").Value),
-                    OutputPin = Convert.ToInt32(monitoringConfig.FirstOrDefault(c => c.Key == "OutputPin").Value)
-                };
-
-                InputMonitorings.Add(new InputMonitoring(Device, config));
-            }  
-            //DataStorageLibrary.DataStorageLibrary.StoreCycleMachineConfigurations(inputMonitoringConfigurations);
-        }
-
-
-        public void PublishActualCycleMachineData(CycleMachine cycleMachine)
-        {
-            var actualCycleMachineData = new Dictionary<string, string>
-        {
-           { "MachineState", cycleMachine.CurrentMachineState.ToString() },
-           { "DailyCycleCounter", cycleMachine.DailyCycleCounter.ToString() },
-           { "CycleTime", cycleMachine.LastCycleTime.ToString() },
-           { "CyclesInThisPeriod", cycleMachine.CyclesInThisPeriod.ToString()},
-           { "MachineId", cycleMachine.CycleMachineConfiguration.MachineId.ToString() },
-           { "StateDuration", cycleMachine.StateDuration.ToString(@"dd\.hh\:mm\:ss") }
-        };
-            _hub.InvokeAsync("PublishActualCycleMachineData", actualCycleMachineData);
+            _hub.InvokeAsync("PublishActualMachineData", actualMachineData);
         }
     }
 }

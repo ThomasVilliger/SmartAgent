@@ -16,5 +16,7 @@ namespace SmartDataHub.Models
         [RegularExpression(@"^(?:[0-9]{1,3}.){3}[0-9]{1,3}$")]
         [Required]
         public virtual string IpAddress { get; set; }
+
+        public int LastSmartAgentHistoryId { get; set; }
     }
 }
