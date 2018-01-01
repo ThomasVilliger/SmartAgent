@@ -15,14 +15,14 @@ using Microsoft.EntityFrameworkCore;
 namespace SmartDataHub
 {
     public static class DataAccess
-    { 
+    {
         private static readonly HttpClient client = new HttpClient();
         public static DbContextOptions<SmartDataHubStorageContext> DbContextOptions;
 
         public static List<Machine> GetMachines(int smartAgentId)
         {
             SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
-            return dbContext.Machine.Where(m => m.SmartAgentId == smartAgentId  && m.Active == true).ToList();
+            return dbContext.Machine.Where(m => m.SmartAgentId == smartAgentId && m.Active == true).ToList();
         }
 
 
@@ -33,21 +33,21 @@ namespace SmartDataHub
         }
 
 
-        public static async Task GetNewHistoryDataFromSmartAgent (int smartAgentId)
-        {       
-           SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
+        public static async Task GetNewHistoryDataFromSmartAgent(int smartAgentId)
+        {
+            SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
 
-           var smartAgent  = dbContext.SmartAgent.FirstOrDefault(s => s.SmartAgentId == smartAgentId);
-           string ip = smartAgent.IpAddress;
-           string url = String.Format(@"http://{0}:8800/api/getMachineStateHistoryData/{1}", ip, smartAgent.LastSmartAgentHistoryId);
+            var smartAgent = dbContext.SmartAgent.FirstOrDefault(s => s.SmartAgentId == smartAgentId);
+            string ip = smartAgent.IpAddress;
+            string url = String.Format(@"http://{0}:8800/api/getMachineStateHistoryData/{1}", ip, smartAgent.LastSmartAgentHistoryId);
 
             var response = await client.GetAsync(url);
-            var responseMessage = await response.Content.ReadAsStringAsync(); 
+            var responseMessage = await response.Content.ReadAsStringAsync();
             var success = response.IsSuccessStatusCode;
 
             if (success)
             {
-                var historyData = new List<MachineStateHistory>();  
+                var historyData = new List<MachineStateHistory>();
                 historyData = JsonConvert.DeserializeObject<List<MachineStateHistory>>(responseMessage);
                 historyData.OrderBy(h => h.SmartAgentHistoryId);
 
@@ -56,7 +56,7 @@ namespace SmartDataHub
                     m.Duration = m.EndDateTime - m.StartDateTime;
                 }
 
-                dbContext.MachineStateHistory.AddRange(historyData);       
+                dbContext.MachineStateHistory.AddRange(historyData);
                 smartAgent.LastSmartAgentHistoryId = historyData.Last().SmartAgentHistoryId;
                 dbContext.SaveChanges();
             }

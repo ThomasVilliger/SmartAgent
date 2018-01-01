@@ -17,7 +17,7 @@ namespace DeviceMonitoring
     {
       
         private IDeviceCommunication deviceCommunication;
-        private static Timer _heartbeatTimer = new Timer(3000);
+        //private static Timer _heartbeatTimer = new Timer(3000);
         private static IHubClients _clients;
 
         public MonitoringHub()
@@ -26,19 +26,19 @@ namespace DeviceMonitoring
             //deviceCommunication = new RESTfulDeviceCommunication(this);
             deviceCommunication = new SignalRdeviceCommunication(this);
 
-            _heartbeatTimer.Elapsed -= Heartbeat;
-            _heartbeatTimer.Elapsed += Heartbeat;
-            _heartbeatTimer.AutoReset = true;
-            _heartbeatTimer.Start();
+            //_heartbeatTimer.Elapsed -= Heartbeat;
+            //_heartbeatTimer.Elapsed += Heartbeat;
+            //_heartbeatTimer.AutoReset = true;
+            //_heartbeatTimer.Start();
         }
 
-        private static void Heartbeat(Object source, ElapsedEventArgs e)
-        {
-            if (_clients != null)
-            {
-                _clients.All.InvokeAsync("Heartbeat", true);
-            }
-        }
+        //private static void Heartbeat(Object source, ElapsedEventArgs e)
+        //{
+        //    if (_clients != null)
+        //    {
+        //        _clients.All.InvokeAsync("Heartbeat", true);
+        //    }
+        //}
 
         public async  Task    SetDeviceInput(int pinNumber, bool state)
         {

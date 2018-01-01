@@ -17,9 +17,8 @@ namespace PiFace_II
         public string DeviceName { get; } = "Simulator";
 
         public List<IInput> Inputs { get; } = new List<IInput>();
-
         public List<IOutput> Outputs { get; } = new List<IOutput>();
-       
+
 
 
         public DeviceSimulator(IMonitoringHubCommunication gatewayCommunication, bool produceRandomInputValues)
@@ -40,44 +39,23 @@ namespace PiFace_II
         }
 
 
-
-
-
         public void SetDeviceInput(int pinNumber, bool state)
         {
-                if (pinNumber < NumberOfInputs)
-                {
-                    Inputs[pinNumber].State = state;
-                }        
+            if (pinNumber < NumberOfInputs)
+            {
+                Inputs[pinNumber].State = state;
+            }
         }
 
 
         public void SetDeviceOutput(int pinNumber, bool state)
         {
-                if (pinNumber < NumberOfInputs)
-                {
-                    Outputs[pinNumber].State = state;
-                }
+            if (pinNumber < NumberOfInputs)
+            {
+                Outputs[pinNumber].State = state;
+            }
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -91,7 +69,7 @@ namespace PiFace_II
 
         private ThreadPoolTimer timerRandomInputValue;
 
-  
+
 
         public DeviceSimulatorInput(int index)
         {
@@ -104,8 +82,6 @@ namespace PiFace_II
                                    TimeSpan.FromMilliseconds(1000));
             }
         }
-
-
 
 
         public bool State
@@ -125,35 +101,27 @@ namespace PiFace_II
             }
         }
 
-
-
         private void UpdateSimValue(ThreadPoolTimer timer)
         {
 
             if (updateCounter == PinNumber)
             {
-
-
                 Random r1 = new Random();
                 if (r1.Next() % 2 == 0)
                 {
-
                     State = true;
                 }
-
                 else
                 {
                     State = false;
                 }
-
             }
             updateCounter++;
 
-            if (updateCounter >= 8 )
+            if (updateCounter >= 8)
             {
                 updateCounter = 0;
             }
-
         }
     }
 

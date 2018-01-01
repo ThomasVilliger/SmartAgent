@@ -13,38 +13,25 @@ using DataStorageLibrary;
 
 namespace PiFace_II
 {
-  public  class Machine 
+    public class Machine
     {
         public int DailyCycleCounter { get; set; } // TODO Reset at 24:00:00
         public int CyclesInThisPeriod { get; set; }
         public long LastCycleTime { get; set; }
-
         public TimeSpan StateDuration { get; set; }
-
         private DateTime MachineStateStarted;
-
         public MachineConfiguration MachineConfiguration { get; set; }
-
         public List<MachineStateHistory> MachineStateHistory { get; set; }
-
-
         public MachineStateHistory.State CurrentMachineState { get; set; }
         public MachineStateHistory.State LastMachineStateInMachineStateHistory { get; set; }
-
-        // private DispatcherTimer timerCycleTimeOut;
-
         private ThreadPoolTimer timerCycleTimeOut;
-
         private ThreadPoolTimer timerMachineDataPublish;
-
         Stopwatch cycleTimeStopWatch = new Stopwatch();
-
         private GatewayHubHandler _gatewayHubCommunication;
-
         private IDevice _device;
-        
 
-        public Machine ( IDevice device  , GatewayHubHandler gatewayHubCommunication, MachineConfiguration machineConfiguration)
+
+        public Machine(IDevice device, GatewayHubHandler gatewayHubCommunication, MachineConfiguration machineConfiguration)
         {
             _device = device;
             MachineStateStarted = DateTime.Now;
@@ -55,19 +42,14 @@ namespace PiFace_II
             device.Inputs[machineConfiguration.CycleInputPin].InputChanged += InputInterpretation;
             CurrentMachineState = DataStorageLibrary.MachineStateHistory.State.Stopped;
             LastMachineStateInMachineStateHistory = DataStorageLibrary.MachineStateHistory.State.Stopped;
-            
 
             MachineStateHistory = new List<MachineStateHistory>();
 
-     timerCycleTimeOut =     ThreadPoolTimer.CreatePeriodicTimer(CycleTimeOut,
-                                        TimeSpan.FromMilliseconds(machineConfiguration.MachineStateTimeout));
+            timerCycleTimeOut = ThreadPoolTimer.CreatePeriodicTimer(CycleTimeOut,
+                                               TimeSpan.FromMilliseconds(machineConfiguration.MachineStateTimeout));
 
             timerMachineDataPublish = ThreadPoolTimer.CreatePeriodicTimer(PublishActualMachineData,
                                         TimeSpan.FromMilliseconds(machineConfiguration.PublishingIntervall));
-
-
-
-
         }
 
         private void PublishActualMachineData(ThreadPoolTimer timer)
@@ -87,7 +69,7 @@ namespace PiFace_II
             }
         }
 
-        private void InputInterpretation(IInput input) 
+        private void InputInterpretation(IInput input)
         {
             if (input.State == false) // after each falling flank..
             {
@@ -95,7 +77,6 @@ namespace PiFace_II
                 CyclesInThisPeriod++;
                 cycleTimeStopWatch.Stop();
                 LastCycleTime = cycleTimeStopWatch.ElapsedMilliseconds;
-
             }
 
             else  // after each rising flank..
@@ -103,35 +84,31 @@ namespace PiFace_II
                 cycleTimeStopWatch.Restart();
             }
 
-            
             ResetTimerCycleTimeOut();
 
-            if(LastMachineStateInMachineStateHistory != DataStorageLibrary.MachineStateHistory.State.Running)
+            if (LastMachineStateInMachineStateHistory != DataStorageLibrary.MachineStateHistory.State.Running)
             {
 
                 MachineStateStarted = DateTime.Now;
 
                 CurrentMachineState = DataStorageLibrary.MachineStateHistory.State.Running;
                 feedMachineStateHistory();
-
-                
             }
         }
 
 
-        public void CycleTimeOut (object sender, object e)
-        {    
+        public void CycleTimeOut(object sender, object e)
+        {
             if (LastMachineStateInMachineStateHistory != DataStorageLibrary.MachineStateHistory.State.Stopped)
             {
                 CurrentMachineState = DataStorageLibrary.MachineStateHistory.State.Stopped;
                 feedMachineStateHistory();
-
                 MachineStateStarted = DateTime.Now;
             }
         }
 
 
-        public  void ResetTimerCycleTimeOut()
+        public void ResetTimerCycleTimeOut()
         {
             timerCycleTimeOut.Cancel();
             timerCycleTimeOut = ThreadPoolTimer.CreatePeriodicTimer(CycleTimeOut,
@@ -149,8 +126,6 @@ namespace PiFace_II
 
         private void feedMachineStateHistory()
         {
-
-
             if (MachineStateHistory.Count > 0 && MachineStateHistory.Last().EndDateTime == DateTime.MinValue)  // conclude last machine state..
             {
                 MachineStateHistory lastEntity = MachineStateHistory.Last();
@@ -163,28 +138,15 @@ namespace PiFace_II
                     lastEntity.CyclesInThisPeriod = CyclesInThisPeriod;
 
                     DataAccess.AddDataMachineStateHistory(lastEntity);
-
-
-
                 }
             }
-
-
-
-            
-
-
-
-
-
-
 
 
             LastMachineStateInMachineStateHistory = CurrentMachineState;
             CyclesInThisPeriod = 0;
 
             int index;
-            if(MachineStateHistory.Count()>20)
+            if (MachineStateHistory.Count() > 20)
             {
                 index = MachineStateHistory.Count() - 20;
             }
@@ -194,10 +156,7 @@ namespace PiFace_II
             }
 
             MachineStateHistory.RemoveRange(0, index);
-
             MachineStateHistory.Add(new MachineStateHistory(CurrentMachineState, MachineConfiguration.MachineId));
-
-
             _gatewayHubCommunication.NewHistoryDataNotification();
         }
     }

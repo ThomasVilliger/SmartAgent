@@ -10,55 +10,34 @@ namespace PiFace_II.DeviceGatewayCommunication
 {
     class SignalRMonitoringHubCommunication : IMonitoringHubCommunication
     {
-        private  ThreadPoolTimer _hearthbeatWatchdog;
-
         private static HubConnection _hub;
         public SignalRMonitoringHubCommunication()
         {
-
-            _hearthbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToMonitoringHub,
-                                   TimeSpan.FromMilliseconds(9000));
-
             EstablishHubConnection();
         }
 
-        private void NoConnectionToMonitoringHub(ThreadPoolTimer timer)
+        private async Task NoConnectionToMonitoringHub(Exception ex)
         {
             _hub.DisposeAsync();
             EstablishHubConnection();
-
         }
 
-
-        private void ResetHeartBeatWatchDogTimer()
-        {
-            lock (this)
-            {
-                _hearthbeatWatchdog.Cancel();
-                _hearthbeatWatchdog = null;
-                _hearthbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToMonitoringHub,
-                                      TimeSpan.FromMilliseconds(9000));
-            }
-        }
 
         private async Task EstablishHubConnection()
-        {
-           
+        {          
             string url = @"http://192.168.0.13:59162/MonitoringHub";
             _hub = new HubConnectionBuilder().WithUrl(url).Build();
-            _hub.On<bool>("Heartbeat", p => Heartbeat(p));
-          
-             _hub.StartAsync();
-        }
 
-        private void Heartbeat(bool p)
-        {
-            ResetHeartBeatWatchDogTimer();
-        }
+            _hub.Closed -= NoConnectionToMonitoringHub;
+            _hub.Closed += NoConnectionToMonitoringHub;
 
-        private void OnConnectionError(Task arg1, object arg2)
-        {
-            Console.WriteLine("MonitoringHub connection error");
+            await _hub.StartAsync().ContinueWith(task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    NoConnectionToMonitoringHub(null);
+                }
+            });
         }
 
         public void UpdateSingleInputState(IInput input)
@@ -72,6 +51,5 @@ namespace PiFace_II.DeviceGatewayCommunication
             PinState pinState = new PinState { PinNumber = output.PinNumber, State = output.State };
             _hub?.InvokeAsync("UpdateSingleOutputState", pinState);
         }
-
     }
 }

@@ -38,15 +38,17 @@ namespace DataStorageLibrary
 
 
                 tableCommand = "CREATE TABLE IF NOT " +
+                "EXISTS  GatewayHub ( Id INTEGER PRIMARY KEY AUTOINCREMENT, Priority INTEGER NOT NULL, IpAddress TEXT NOT NULL)";
+                createTable = new SqliteCommand(tableCommand, db);
+                createTable.ExecuteReader();
+
+
+                tableCommand = "CREATE TABLE IF NOT " +
                    "EXISTS   MachineStateHistory ( Id INTEGER PRIMARY KEY AUTOINCREMENT, MachineId INTEGER NOT NULL, MachineState INT NOT NULL, StartDateTime TEXT NOT NULL, EndDateTime TEXT NOT NULL, Duration TEXT NOT NULL, DailyCycleCounter INTEGER NOT NULL, CyclesInThisPeriod INTEGER NOT NULL )";
 
                 createTable = new SqliteCommand(tableCommand, db);
 
                 createTable.ExecuteReader();
-
-
-
-
 
                 db.Close();
             }

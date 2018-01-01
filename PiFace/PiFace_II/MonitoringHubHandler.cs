@@ -13,13 +13,13 @@ namespace PiFace_II
     {
         private static HubConnection _hub;
         private IDevice _device;
-        private  ThreadPoolTimer _heartbeatWatchdog;
+        //private  ThreadPoolTimer _heartbeatWatchdog;
 
         public MonitoringHubHandler(IDevice device)
         {
 
-            _heartbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToGatewayHub,
-                                   TimeSpan.FromMilliseconds(9000));
+            //_heartbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToGatewayHub,
+            //                       TimeSpan.FromMilliseconds(9000));
 
             _device = device;
             EstablishHubConnection();
@@ -30,28 +30,28 @@ namespace PiFace_II
 
 
 
-        private void ResetHeartbeatWatchDog()
-        {
-            _heartbeatWatchdog.Cancel();
-            _heartbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToGatewayHub,
-                                  TimeSpan.FromMilliseconds(9000));
-        }
+        //private void ResetHeartbeatWatchDog()
+        //{
+        //    _heartbeatWatchdog.Cancel();
+        //    _heartbeatWatchdog = ThreadPoolTimer.CreatePeriodicTimer(NoConnectionToGatewayHub,
+        //                          TimeSpan.FromMilliseconds(9000));
+        //}
 
 
-        private void NoConnectionToGatewayHub(ThreadPoolTimer timer)
+        private async Task NoConnectionToMonitoringHub(Exception ex)
         {
 
             _hub.DisposeAsync();
             EstablishHubConnection();
-            ResetHeartbeatWatchDog();
+            //ResetHeartbeatWatchDog();
 
         }
 
 
-        private void Heartbeat(bool p)
-        {
-            ResetHeartbeatWatchDog();
-        }
+        //private void Heartbeat(bool p)
+        //{
+        //    ResetHeartbeatWatchDog();
+        //}
 
 
 
@@ -62,7 +62,7 @@ namespace PiFace_II
            
             string url = @"http://192.168.0.13:59162/MonitoringHub";
         _hub = new HubConnectionBuilder().WithUrl(url).Build();
-            _hub.On<bool>("Heartbeat", p => Heartbeat(p));
+            //_hub.On<bool>("Heartbeat", p => Heartbeat(p));
             _hub.On<PinState>("SetDeviceInput", pinState => SetDeviceInput(pinState));
             _hub.On<PinState>("SetDeviceOutput", pinState => SetDeviceOutput(pinState));
 
@@ -70,9 +70,16 @@ namespace PiFace_II
             _hub.On("GetAllOutputStates", GetAllOutputStates);
 
 
-            await _hub.StartAsync().ContinueWith(OnConnectionError, TaskContinuationOptions.OnlyOnFaulted);
+            _hub.Closed -= NoConnectionToMonitoringHub;
+            _hub.Closed += NoConnectionToMonitoringHub;
 
-            //await _hub.StartAsync(); 
+            await _hub.StartAsync().ContinueWith(task =>
+            {
+                if (task.IsFaulted || task.IsCanceled)
+                {
+                    NoConnectionToMonitoringHub(null);
+                }
+            });
         }
 
         private void GetAllInputStates()
@@ -98,10 +105,10 @@ namespace PiFace_II
             _hub.InvokeAsync("UpdateAllOutputStates", outputStates);
         }
 
-        private void OnConnectionError(Task arg1, object arg2)
-    {
-        Console.WriteLine("MonitoringHub connection error");
-    }
+    //    private void OnConnectionError(Task arg1, object arg2)
+    //{
+    //    Console.WriteLine("MonitoringHub connection error");
+    //}
 
 
 

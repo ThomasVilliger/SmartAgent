@@ -35,8 +35,8 @@ namespace PiFace_II
             //device = new PiFaceDevice(new SignalRMonitoringHubCommunication());
             //device = new PiFaceDevice(new RESTfulMonitoringHubCommunication());
 
-            //   device = new DeviceSimulator(new RESTfulMonitoringHubCommunication(), true);
-            device = new DeviceSimulator(new SignalRMonitoringHubCommunication(), true);
+            device = new DeviceSimulator(new RESTfulMonitoringHubCommunication(), true);
+            //device = new DeviceSimulator(new SignalRMonitoringHubCommunication(), true);
             //device = new DeviceSimulator(new RESTfulMonitoringHubCommunication(), false);
             //device = new DeviceSimulator(new SignalRMonitoringHubCommunication(), false);
         }

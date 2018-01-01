@@ -107,7 +107,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ActualMachineData.cs" />
-    <Compile Include="CycleMachine.cs" />
+    <Compile Include="Machine.cs" />
     <Compile Include="DeviceToMonitoringHubCommunication\IMonitoringHubCommunication.cs" />
     <Compile Include="DeviceToMonitoringHubCommunication\RESTfulMonitoringHubCommunication.cs" />
     <Compile Include="DeviceToMonitoringHubCommunication\SignalRMonitoringHubCommunication.cs" />

@@ -5,7 +5,7 @@
 <head>
     <script src="~/lib/SignalR/signalr-client-1.0.0-alpha2-final.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.js"></script>
-  
+
     <link href="~/css/allViews.css" rel="stylesheet" />
     <link href="~/css/smartAgentConfiguration.css" rel="stylesheet" />
 </head>
@@ -14,88 +14,86 @@
 <script>
     $(document).ready(function () {
 
-           let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
+        let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
 
-           hubConnection.on('SmartAgentConfigurationResponse', function (success, message, isGreenColored)
-           {
-                   var resultText;
-                   $("#infosHeader").text(""); 
-                   if (success)
-                   {
-                       if (isGreenColored)
-                       {
-                           $("#infos").append("<p style=\"color:green;\">" + message + "</p>");
-                       }
-                       else
-                       {
-                           $("#infos").append("<p>" + message + "</p>");
-                       }
-                   }
-                   else
-                   {
-                       $("#infos").append("<p style=\"color:red;\">" + message + "</p>");
-                   }            
-           });
+        hubConnection.on('SmartAgentConfigurationResponse', function (isSuccess, message, isGreenColored, isHeader) {
+            if (isHeader) {
+                $("#infosHeader").text(message);
+            }
 
+            else {
+                var resultText;
+                $("#infosHeader").text("");
 
-           hubConnection.on('NoConnectionToGatewayHub', function ()
-           {
-               $("#connectionState").text("no connection to main server");
-           });
+                if (isSuccess) {
 
+                    if (isGreenColored) {
+                        $("#infos").append("<p style=\"color:green;\">" + message + "</p>");
+                    }
 
-           hubConnection.on('Heartbeat', function ()
-           {
-               $("#connectionState").text("");
-           });
+                    else {
+                        $("#infos").append("<p>" + message + "</p>");
+                    }
+                }
+
+                else {
+                    $("#infos").append("<p style=\"color:red;\">" + message + "</p>");
+                }
+            }
+        });
 
 
-           $(".testSmartAgentConnection").click(function ()
-           {
-               var smartAgentIpAddress = this.value
-               $("#infos >p").remove();
-
-               var text = "connecting to SmartAgent "  + smartAgentIpAddress + "...";
-               $("#infosHeader").text(text);
-               hubConnection.invoke('TestSmartAgentConnection', smartAgentIpAddress);
-           });
+        hubConnection.on('NoConnectionToGatewayHub', function () {
+            $("#connectionState").text("no connection to main server");
+        });
 
 
-           $(".openWebinterface").click(function ()
-           {
-               var smartAgentIpAddress = this.value
-               var port = ":59162";
-               var url = "http://" + smartAgentIpAddress + port;
-
-               window.open(url);
-           });
+        hubConnection.on('ConnectionToGatewayHubEstablished', function () {
+            $("#connectionState").text("");
+        });
 
 
-           $("#searchSmartAgents").click(function ()
-           {
-               $("#infos >p").remove(); 
-               var text = "searching availabe SmartAgents in network...";
-               $("#infosHeader").text(text);
+        $(".testSmartAgentConnection").click(function () {
+            var smartAgentIpAddress = this.value
+            $("#infos >p").remove();
 
-               hubConnection.invoke('GetAllSmartAgentConnections');
-           });
-
-
-           $(".initializeConfiguration").click(function ()
-           {
-               $("#infos >p").remove(); 
-
-               var smartAgentIpAddress = this.value
-               var smartAgentId = this.getAttribute("data-value2");
-               hubConnection.invoke('InitializeSmartAgentConfigurations', smartAgentIpAddress, smartAgentId);
-
-               var text = "inizialize SmartAgent " + smartAgentIpAddress + "...";
-               $("#infosHeader").text(text); 
-           });
+            var text = "connecting to SmartAgent " + smartAgentIpAddress + "...";
+            $("#infosHeader").text(text);
+            hubConnection.invoke('TestSmartAgentConnection', smartAgentIpAddress);
+        });
 
 
-           hubConnection.start();
-       });
+        $(".openWebinterface").click(function () {
+            var smartAgentIpAddress = this.value
+            var port = ":59162";
+            var url = "http://" + smartAgentIpAddress + port;
+
+            window.open(url);
+        });
+
+
+        $("#searchSmartAgents").click(function () {
+            $("#infos >p").remove();
+            var text = "searching availabe SmartAgents in network...";
+            $("#infosHeader").text(text);
+
+            hubConnection.invoke('BroadcastSearchSmartAgents');
+        });
+
+
+        $(".initializeConfiguration").click(function () {
+            $("#infos >p").remove();
+
+            var smartAgentIpAddress = this.value
+            var smartAgentId = this.getAttribute("data-value2");
+            hubConnection.invoke('InitializeSmartAgentConfigurations', smartAgentIpAddress, smartAgentId);
+
+            var text = "inizialize SmartAgent " + smartAgentIpAddress + "...";
+            $("#infosHeader").text(text);
+        });
+
+        hubConnection.start();
+    });
 </script>
 
 
@@ -111,12 +109,12 @@
 <table class="table">
     <thead>
         <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Name)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IpAddress)
-                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IpAddress)
+            </th>
             <th>
                 <button id="searchSmartAgents">Broadcast Search</button>
             </th>
@@ -124,31 +122,32 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IpAddress)
-            </td>
-            <td>
-                <button class="testSmartAgentConnection" value="@item.IpAddress">Test Connection</button>
-            </td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IpAddress)
+                </td>
+                <td>
+                    <button class="testSmartAgentConnection" value="@item.IpAddress">Test Connection</button>
+                </td>
 
-            <td>
-                <button class="openWebinterface" value="@item.IpAddress">Open Webinterface</button>
-            </td>
-            <td>
-                <button class="initializeConfiguration" value="@item.IpAddress" data-value2="@item.SmartAgentId">Initialize Config</button>
-            </td>         
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SmartAgentId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SmartAgentId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SmartAgentId">Delete</a>
-           </td>
-        </tr>
-}
+                <td>
+                    <button class="openWebinterface" value="@item.IpAddress">Open Webinterface</button>
+                </td>
+                <td>
+                    <button class="initializeConfiguration" value="@item.IpAddress" data-value2="@item.SmartAgentId">Initialize Config</button>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.SmartAgentId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.SmartAgentId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.SmartAgentId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
 

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.SignalR.Internal;
+using System.Net.Http;
+using System.Net;
 
 namespace DeviceMonitoring.Controllers
 {
@@ -61,35 +63,37 @@ namespace DeviceMonitoring.Controllers
 
 
         // POST: DeviceIOcontroller/Create
-        [HttpPost]
+        [HttpPut]
       //  [ValidateAntiForgeryToken]
-        public ActionResult UpdateSingleInputState(IFormCollection collection)
+        public HttpResponseMessage UpdateSingleInputState([FromBody] PinState pinState)
         {
+            //try
+            //{
+            //    int pinNumber = Convert.ToInt32(collection.FirstOrDefault(m => m.Key=="PinNumber").Value);
+            //    bool state = Convert.ToBoolean(collection.FirstOrDefault(m => m.Key == "State").Value);
+
+
+
+
+            //         object pinState = new PinState { PinNumber = pinNumber, State = state };
+
+            //    //Clients.All.UpdateInput(pinNumber, state); old
+
+
             try
             {
-                int pinNumber = Convert.ToInt32(collection.FirstOrDefault(m => m.Key=="PinNumber").Value);
-                bool state = Convert.ToBoolean(collection.FirstOrDefault(m => m.Key == "State").Value);
-
-         
-
-
-                     object pinState = new PinState { PinNumber = pinNumber, State = state };
-
-                //Clients.All.UpdateInput(pinNumber, state); old
-
-        
-        
 
                 _hubContext.Clients.All.InvokeAsync("UpdateSingleInputState", pinState);
+                return new HttpResponseMessage(HttpStatusCode.OK);
 
-
-                return RedirectToAction(nameof(Index));
             }
-            catch
+
+            catch (Exception ex)
             {
-                return View();
-
+                return new HttpResponseMessage(HttpStatusCode.Conflict);
             }
+
+              
         }
 
 
@@ -141,34 +145,19 @@ namespace DeviceMonitoring.Controllers
 
 
         // POST: DeviceIOcontroller/Create
-        [HttpPost]
+        [HttpPut]
     //    [ValidateAntiForgeryToken]
-        public ActionResult UpdateSingleOutputState(IFormCollection collection)
+        public HttpResponseMessage UpdateSingleOutputState([FromBody] PinState pinState)
         {
             try
             {
-                int pinNumber = Convert.ToInt32(collection.FirstOrDefault(m => m.Key == "PinNumber").Value);
-                bool state = Convert.ToBoolean(collection.FirstOrDefault(m => m.Key == "State").Value);
-
-
-
-
-                object pinState = new PinState { PinNumber = pinNumber, State = state };
-
-                //Clients.All.UpdateInput(pinNumber, state); old
-
-
-              
-
                 _hubContext.Clients.All.InvokeAsync("UpdateSingleOutputState", pinState);
-
-
-                return RedirectToAction(nameof(Index));
+                return new HttpResponseMessage(HttpStatusCode.OK);
             }
-            catch
-            {
-                return View();
 
+            catch (Exception ex)
+            {
+                return new HttpResponseMessage(HttpStatusCode.Conflict);
             }
         }
 

@@ -9,40 +9,47 @@ using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Timers;
+using System.Net;
+using System.Threading;
 
 namespace SmartDataHub
 {
     public class SmartDataSignalRhub : Hub
     {
-        private static readonly HttpClient client = new HttpClient();   
-        public  static IHubClients  SmartDataHubClients;
-
+        private static readonly HttpClient client = new HttpClient();
+        public static IHubClients SmartDataHubClients;
 
         public async Task TestSmartAgentConnection(string ip)
         {
             try
             {
+                var cts = new CancellationTokenSource();
+                cts.CancelAfter(100);
+                CancellationToken ct = cts.Token;
+
+
                 string url = String.Format(@"http://{0}:8800/api/testSmartAgentConnection", ip);
-                var response = await client.GetAsync(url);
+                var response = await client.GetAsync(url, ct);
                 var responseMessage = await response.Content.ReadAsStringAsync();
                 var success = response.IsSuccessStatusCode;
 
                 if (success)
                 {
-                    var message = String.Format("Connection to {0} successfull", ip);
-                    SmartAgentConfigurationResponse(true, message, null, true);
+                    var message = String.Format("Connection to SmartAgent {0} successfull", ip);
+                    SmartAgentConfigurationResponse(true, message, null, true, false);
                 }
                 else
-                {         
-                      var  message =  responseMessage;
-                      var defaultMessage = "connection test failed";
-                      SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+                {
+                    var message = responseMessage;
+                    var defaultMessage = "connection test failed";
+                    SmartAgentConfigurationResponse(false, message, defaultMessage, false, false);
                 }
             }
 
-            catch (Exception ex)
+            catch (TaskCanceledException ex)
             {
-                SmartAgentConfigurationResponse(false, ex.Message, null, false);
+                var message = "connection test failed";
+                SmartAgentConfigurationResponse(false, message, null, false, false);
             }
         }
 
@@ -58,28 +65,23 @@ namespace SmartDataHub
 
             catch (Exception ex)
             {
-                SmartAgentConfigurationResponse(false, "Initialization failed", null, false);
-                SmartAgentConfigurationResponse(false, ex.Message, null, false);
+                SmartAgentConfigurationResponse(false, "Initialization failed", null, false, false);
+                SmartAgentConfigurationResponse(false, ex.Message, null, false, false);
             }
         }
 
 
 
-        private async  Task InitializeMachinesOnSmartAgent(string ip, int smartAgentId)
+        private async Task InitializeMachinesOnSmartAgent(string ip, int smartAgentId)
         {
             var values = DataAccess.GetMachines(smartAgentId);
-            //var content = new FormUrlEncodedContent(values);
             var jsonContent = JsonConvert.SerializeObject(values);
             var stringContent = new StringContent(jsonContent.ToString());
-
-            //stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
             string url = String.Format(@"http://{0}:8800/api/initializeNewMachines", ip);
             var response = await client.PutAsync(url, stringContent);
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
-
-
 
             if (success)
             {
@@ -87,15 +89,15 @@ namespace SmartDataHub
                 var configuredMachines = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
                 var defaultMessage = "no machines configured for this SmartAgent";
 
-                SmartAgentConfigurationResponse(true, message, null, true);
-                SmartAgentConfigurationResponse(true, configuredMachines, defaultMessage, false);
+                SmartAgentConfigurationResponse(true, message, null, true, false);
+                SmartAgentConfigurationResponse(true, configuredMachines, defaultMessage, false, false);
             }
 
-           else
-           {
+            else
+            {
                 var message = responseMessage;
                 var defaultMessage = "Failed to write down machine configurations on SmartAgent";
-                SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false, false);
             }
         }
 
@@ -116,15 +118,15 @@ namespace SmartDataHub
                 var configuredInputMonitorings = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
                 var defaultMessage = "no input Monitorings configured for this SmartAgent";
 
-                SmartAgentConfigurationResponse(true, message, null, true);
-                SmartAgentConfigurationResponse(true, configuredInputMonitorings, defaultMessage, false);
+                SmartAgentConfigurationResponse(true, message, null, true, false);
+                SmartAgentConfigurationResponse(true, configuredInputMonitorings, defaultMessage, false, false);
             }
 
             else
-           {
+            {
                 var message = responseMessage;
                 var defaultMessage = "Failed to write down inputMonitoring configurations on SmartAgent";
-                SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false, false);
             }
         }
 
@@ -142,19 +144,19 @@ namespace SmartDataHub
             if (success)
             {
                 var message = String.Format("SmartAgent successfully signed with Id {0} and running with new configuration", smartAgentId);
-                SmartAgentConfigurationResponse(true, message, null, true);
+                SmartAgentConfigurationResponse(true, message, null, true, false);
             }
             else
             {
                 var message = responseMessage;
                 var defaultMessage = "Failed to sign SmartAgent";
 
-                SmartAgentConfigurationResponse(false, message, defaultMessage, false);
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false, false);
             }
         }
 
 
-        public static void SmartAgentConfigurationResponse(bool isSuccess, string message, string defaultMessage, bool isGreenColored)
+        public static async void SmartAgentConfigurationResponse(bool isSuccess, string message, string defaultMessage, bool isGreenColored, bool isHeader)
         {
             string responseMessage;
 
@@ -166,14 +168,72 @@ namespace SmartDataHub
             {
                 responseMessage = defaultMessage;
             }
-
-            SmartDataHubClients.All.InvokeAsync("SmartAgentConfigurationResponse", isSuccess, responseMessage, isGreenColored);
+            await SmartDataHubClients.All.InvokeAsync("SmartAgentConfigurationResponse", isSuccess, responseMessage, isGreenColored, isHeader);
         }
 
-        public async Task GetAllSmartAgentConnections()
+
+        public async Task BroadcastSearchSmartAgents()
         {
-            SmartDataSignalRclient.GetAllSmartAgentConnections();
+
+            string hostName = Dns.GetHostName();
+            IPHostEntry hostInfo = Dns.GetHostEntry(hostName);
+            bool anySmartAgentFound = false;
+
+            foreach (IPAddress ip in hostInfo.AddressList)
+            {
+                byte[] adressBytes = { 0, 0, 0, 0 };
+
+                if (!(ip.IsIPv6LinkLocal | ip.IsIPv6Multicast | ip.IsIPv6SiteLocal))
+                    for (int i = 0; i < 255; i++)
+                    {
+                        adressBytes = ip.GetAddressBytes();
+                        adressBytes[3] = (byte)i;
+
+                        if (adressBytes[0] == 192 && adressBytes[3] >= 200 && adressBytes[2] == 0)
+                        {
+                            var ipAddress = new IPAddress(adressBytes);
+
+                            var message = String.Format("Searching SmartAgents {0}...", ipAddress.ToString());
+                            SmartAgentConfigurationResponse(true, message, null, false, true);
+
+                            var cts = new CancellationTokenSource();
+                            cts.CancelAfter(100);
+                            CancellationToken ct = cts.Token;
+
+                            try
+                            {
+                                string url = String.Format(@"http://{0}:8800/api/testSmartAgentConnection", ipAddress.ToString());
+                                var response = await client.GetAsync(url, ct);
+
+                                anySmartAgentFound = true;
+                                var smessage = String.Format("Connection to SmartAgent {0} successfull", ipAddress.ToString());
+                                SmartAgentConfigurationResponse(true, smessage, null, true, false);
+                            }
+                            catch (TaskCanceledException ex)
+                            {
+                                continue;
+                            }
+                        }
+                    }
+            }
+
+            if (!anySmartAgentFound)
+            {
+                var message = String.Format("no SmartAgents found in network");
+                SmartAgentConfigurationResponse(false, message, null, false, false);
+            }
+
+            else
+            {
+                var message = String.Format("broadcast search finished");
+                SmartAgentConfigurationResponse(true, message, null, false, false);
+            }
         }
+
+
+
+
+
 
         public override Task OnConnectedAsync()
         {
