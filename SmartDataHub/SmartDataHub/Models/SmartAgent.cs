@@ -18,5 +18,7 @@ namespace SmartDataHub.Models
         public virtual string IpAddress { get; set; }
 
         public int LastSmartAgentHistoryId { get; set; }
+
+        public int Priority { get; set; }
     }
 }

@@ -16,16 +16,31 @@ namespace SmartDataHub
     public static class SmartDataSignalRclient
     {
         private static HubConnection _gatewayHub;
+        private static Timer _heartbeatTimer = new Timer(3000);
         //private static Timer _heartbeatWatchdog = new Timer(9000);
         //private static Timer _broadcastAllSmargAgentsTimer = new Timer(3000);
+        private static List<SmartAgent> SmartAgents;
+        private static int _smartAgentPriority = 0;
 
-        public static void Initialize()
+        public static async Task Initialize()
         {
             //_broadcastAllSmargAgentsTimer.Elapsed += NoSmartAgentsFoundInNetwork;
             //_heartbeatWatchdog.Elapsed += NoConnectionToGatewayHub;
             //_heartbeatWatchdog.Start();
 
-            EstablishGatewayHubConnection();
+            _heartbeatTimer.Elapsed -= Heartbeat;
+            _heartbeatTimer.Elapsed += Heartbeat;
+            _heartbeatTimer.AutoReset = true;
+            _heartbeatTimer.Start();
+
+            DataAccess.Initialize();
+
+          await  EstablishGatewayHubConnection(null);
+        }
+
+        private static void Heartbeat(object sender, ElapsedEventArgs e)
+        {
+             _gatewayHub?.InvokeAsync("Heartbeat");
         }
 
         //private static void NoSmartAgentsFoundInNetwork(object sender, ElapsedEventArgs e)
@@ -34,19 +49,35 @@ namespace SmartDataHub
         //}
 
 
-        private static async Task NoConnectionToGatewayHub(Exception ex)
+        //private static async Task NoConnectionToGatewayHub(Exception ex)
+        //{
+        //    SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("NoConnectionToGatewayHub");
+
+        //    _gatewayHub.DisposeAsync();
+
+        //    EstablishGatewayHubConnection();
+        //    //ResetHeartbeatWatchdogTimer();
+        //}
+
+        private static async Task EstablishGatewayHubConnection(Exception ex)
         {
-            SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("NoConnectionToGatewayHub");
+            SmartAgents = DataAccess.GetSmartAgents();
 
-            _gatewayHub.DisposeAsync();
+            _gatewayHub?.DisposeAsync();
 
-            EstablishGatewayHubConnection();
-            //ResetHeartbeatWatchdogTimer();
-        }
+            string url;
+            if (SmartAgents.Any())
+            {
+                url = String.Format(@"http://{0}:59162/GatewayHub", SmartAgents[_smartAgentPriority].IpAddress);
+            }
 
-        private static async Task EstablishGatewayHubConnection()
-        {
-            string url = @"http://192.168.0.13:59162/GatewayHub";
+            else
+            {
+                url = String.Format(@"http://localhost:59162/GatewayHub");
+            }
+
+
+
             _gatewayHub = new HubConnectionBuilder().WithUrl(url).Build();
 
             _gatewayHub.On<ActualMachineData>("PublishActualMachineData", actualMachineData => PublishActualMachineData(actualMachineData));
@@ -54,14 +85,15 @@ namespace SmartDataHub
             //_gatewayHub.On<List<string>>("ReturnSmartAgentConnection", connectionAttributes => ReturnSmartAgentConnection(connectionAttributes));
             _gatewayHub.On<int>("NewHistoryDataNotification", smartAgentId => NewHistoryDataNotification(smartAgentId));
 
-            _gatewayHub.Closed -= NoConnectionToGatewayHub;
-            _gatewayHub.Closed += NoConnectionToGatewayHub;
+            _gatewayHub.Closed -= EstablishGatewayHubConnection;
+            _gatewayHub.Closed += EstablishGatewayHubConnection;
 
             await _gatewayHub.StartAsync().ContinueWith(task =>
             {
                 if (task.IsFaulted || task.IsCanceled)
                 {
-                    NoConnectionToGatewayHub(null);
+                    SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("NoConnectionToGatewayHub");
+                    TryNextGatewayHub();
                 }
 
                 else
@@ -69,14 +101,24 @@ namespace SmartDataHub
                     SmartDataSignalRhub.SmartDataHubClients?.All.InvokeAsync("ConnectionToGatewayHubEstablished");
                 }
             });
-
-
-
         }
 
-        private static void NewHistoryDataNotification(int smartAgentId)
+
+        private static async void TryNextGatewayHub()
         {
-            DataAccess.GetNewHistoryDataFromSmartAgent(smartAgentId);
+            ++_smartAgentPriority;
+
+            if (_smartAgentPriority >= SmartAgents.Count)
+            {
+                _smartAgentPriority = 0;
+            }
+           await EstablishGatewayHubConnection(null);
+        }
+
+
+        private static async Task NewHistoryDataNotification(int smartAgentId)
+        {
+          await  DataAccess.GetNewHistoryDataFromSmartAgent(smartAgentId);
         }
 
         //private static void ReturnSmartAgentConnection(List<string> connectionAttributes)

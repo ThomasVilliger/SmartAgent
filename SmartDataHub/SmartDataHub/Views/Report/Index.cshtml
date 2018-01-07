@@ -1,0 +1,270 @@
+﻿@model SmartDataHub.Models.Machine
+
+@{
+//Layout = null;
+}
+
+<head>
+
+
+
+
+
+    <script type="text/javascript" src="~/lib/jquery/dist/jquery.js"></script>
+
+
+
+
+
+
+
+    <script type="text/javascript" src="~/lib/SignalR/signalr-client-1.0.0-alpha2-final.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+    <link href="~/css/allViews.css" rel="stylesheet" />
+    <link href="~/css/smartAgentConfiguration.css" rel="stylesheet" />
+    <link href="~/css/Report.css" rel="stylesheet" />
+
+
+    <script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
+    <link href="~/lib/jquery-ui-1.12.1/jquery-ui.css" rel="stylesheet" />
+
+
+</head>
+
+
+
+
+<script>
+    $(document).ready(function () {
+
+        let hubConnection = new signalR.HubConnection('/ReportHub');
+
+        hubConnection.on('ReportHeaderResponse', function (isSuccess, message) {
+
+            $("#reportInfo").text("");
+            $("#reportTableHead  >th").remove();
+
+            if (isSuccess) {
+
+                $("#reportInfo").text(message);
+
+                var attributes = ["MachineId", "State", "Start", "End", "Duration", "Daily CycleCounter", "Cycles In This Period"]
+
+
+                for (index = 0; index < attributes.length; ++index) {
+
+                    $("#reportTableHead").append("<th>" + attributes[index] + "</th>");
+                }
+
+
+
+
+
+
+            }
+
+            else {
+                $("#reportInfo").append("<p style=\"color:red;\">" + message + "</p>");
+            }
+        });
+
+
+        //$("#Date").datepicker();
+
+
+
+
+        $('.date').datepicker({
+            format: 'dd/mm/yyyy'
+        });
+
+
+
+
+        $.datepicker.setDefaults({
+            showOn: "both",
+            buttonImageOnly: true,
+            buttonImage: "calendar.gif",
+            buttonText: "Calendar"
+        });
+
+
+      
+
+
+        hubConnection.on('ReportDataResponse', function (historyData) {
+
+            $("#reportTableBody >tr").remove();
+
+            for (index = 0; index < historyData.length; ++index) {
+
+
+                if (historyData[index].machineState == 1) {
+
+
+                    $("#reportTableBody").append(
+                        "<tr> <td>" + historyData[index].machineId + "</td>" +
+                        "<td style=\"color:green;\">Running</td>" +
+                        "<td>" + historyData[index].startDateTime + "</td>" +
+                        "<td>" + historyData[index].endDateTime + "</td>" +
+                        "<td>" + historyData[index].duration + "</td>" +
+                        "<td>" + historyData[index].dailyCycleCounter + "</td>" +
+                        "<td>" + historyData[index].cyclesInThisPeriod + "</td> </tr>");
+
+
+                }
+
+
+                else
+                {
+                    $("#reportTableBody").append(
+                        "<tr> <td>" + historyData[index].machineId + "</td>" +
+                        "<td style=\"color:red;\">Stopped</td>" +
+                        "<td>" + historyData[index].startDateTime + "</td>" +
+                        "<td>" + historyData[index].endDateTime + "</td>" +
+                        "<td>" + historyData[index].duration + "</td>" +
+                        "<td>" + historyData[index].dailyCycleCounter + "</td>" +
+                        "<td>" + historyData[index].cyclesInThisPeriod + "</td> </tr>");
+
+
+                }
+            }
+        });
+
+
+        //hubConnection.on('NoConnectionToGatewayHub', function () {
+        //    $("#connectionState").text("no connection to main server");
+        //});
+
+
+        //hubConnection.on('ConnectionToGatewayHubEstablished', function () {
+        //    $("#connectionState").text("");
+        //});
+
+
+        //$(".testSmartAgentConnection").click(function () {
+        //    var smartAgentIpAddress = this.value
+        //    $("#infos >p").remove();
+
+        //    var text = "connecting to SmartAgent " + smartAgentIpAddress + "...";
+        //    $("#infosHeader").text(text);
+        //    hubConnection.invoke('TestSmartAgentConnection', smartAgentIpAddress);
+        //});
+
+
+        //$(".openWebinterface").click(function () {
+        //    var smartAgentIpAddress = this.value
+        //    var port = ":59162";
+        //    var url = "http://" + smartAgentIpAddress + port;
+
+        //    window.open(url);
+        //});
+
+
+        $("#executeReport").click(function () {
+            $("#reportTableBody >tr").remove();
+            var text = "executing Report...";
+            $("#reportInfo").text(text);
+
+
+            var fromDate = $("#dateFrom").datepicker("getDate");
+
+            var toDate = $("#dateTo").datepicker("getDate");
+
+            var machineId = $("#machineId").val();
+            hubConnection.invoke('ExecuteReport', machineId, fromDate, toDate);
+        });
+
+
+        //$(".initializeConfiguration").click(function () {
+        //    $("#infos >p").remove();
+
+        //    var smartAgentIpAddress = this.value
+        //    var smartAgentId = this.getAttribute("data-value2");
+        //    hubConnection.invoke('InitializeSmartAgentConfigurations', smartAgentIpAddress, smartAgentId);
+
+        //    var text = "inizialize SmartAgent " + smartAgentIpAddress + "...";
+        //    $("#infosHeader").text(text);
+        //});
+
+        hubConnection.start();
+    });
+</script>
+
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Machine State History Report</h2>
+<h3 id="connectionState"></h3>
+@*<p>
+        <a asp-action="Create">Add SmartAgent</a>
+    </p>*@
+<table class="table">
+    <thead>
+            <tr>
+                <th>
+                   From
+                </th>
+                <th>
+                   To
+                </th>
+                <th>
+                    Machine
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+    <tbody>
+
+        <tr>
+            <td>
+                <div class="date" id="dateFrom"></div>
+            </td>
+
+            <td>
+                <div class="date"  id="dateTo"></div>
+            </td>
+
+
+            <td
+                   class="form-group">
+                @*<label asp-for="MachineId" class="control-label"></label>*@
+                <select id="machineId" class="form-control" asp-items="ViewBag.MachineId"></select>
+      
+            </td>
+            <td>
+                <button id="executeReport">Execute</button>
+            </td>
+
+            @*<td>
+                    <button class="openWebinterface" >Open Webinterface</button>
+                </td>
+                <td>
+                    <button class="initializeConfiguration">Initialize Config</button>
+                </td>*@
+        </tr>
+
+    </tbody>
+</table>
+
+<div id="reportInfo"></div>
+<table class="table">
+
+    <thead>
+        <tr id="reportTableHead"></tr>
+    </thead>
+    <tbody id=reportTableBody></tbody>
+
+
+</table>

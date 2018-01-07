@@ -14,13 +14,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SmartDataHub
 {
-    public static class DataAccess
+    public  class DataAccess  
     {
         private static readonly HttpClient client = new HttpClient();
         public static DbContextOptions<SmartDataHubStorageContext> DbContextOptions;
 
-        public static List<Machine> GetMachines(int smartAgentId)
+
+        public static void Initialize()
         {
+            var optionsBuilder = new DbContextOptionsBuilder<SmartDataHubStorageContext>();
+            optionsBuilder.UseSqlServer(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=SmartDataHubContext-06372eea-a0ea-43d8-8c67-d0a88d838035;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=True;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+            DbContextOptions = optionsBuilder.Options;
+        }
+
+        internal static List<MachineStateHistory> GetMachineStateHistoryData(int machineId, DateTime fromDate, DateTime toDate)
+        {
+            SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
+            return dbContext.MachineStateHistory.Where(h => h.MachineId == machineId && (h.StartDateTime >= fromDate && h.EndDateTime <= toDate)).ToList();
+        }
+
+        public static List<Machine> GetMachines(int smartAgentId)
+        {        
             SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
             return dbContext.Machine.Where(m => m.SmartAgentId == smartAgentId && m.Active == true).ToList();
         }
@@ -52,7 +66,7 @@ namespace SmartDataHub
                 historyData.OrderBy(h => h.SmartAgentHistoryId);
 
                 foreach (MachineStateHistory m in historyData)
-                {
+                {               
                     m.Duration = m.EndDateTime - m.StartDateTime;
                 }
 
@@ -60,6 +74,14 @@ namespace SmartDataHub
                 smartAgent.LastSmartAgentHistoryId = historyData.Last().SmartAgentHistoryId;
                 dbContext.SaveChanges();
             }
+        }
+
+  
+
+        public static List<SmartAgent> GetSmartAgents()
+        {   
+            SmartDataHubStorageContext dbContext = new SmartDataHubStorageContext(DbContextOptions);
+            return dbContext.SmartAgent.OrderBy(s => s.Priority).ToList();
         }
     }
 }

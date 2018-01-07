@@ -47,7 +47,7 @@ namespace SmartDataHub.Controllers
         // GET: InputMonitoringConfigurations/Create
         public IActionResult Create()
         {
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress");
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name");
             return View();
         }
 
@@ -64,7 +64,7 @@ namespace SmartDataHub.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", inputMonitoring.SmartAgentId);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", inputMonitoring.SmartAgentId);
             return View(inputMonitoring);
         }
 
@@ -81,7 +81,7 @@ namespace SmartDataHub.Controllers
             {
                 return NotFound();
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", inputMonitoring.SmartAgentId);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", inputMonitoring.SmartAgentId);
             return View(inputMonitoring);
         }
 
@@ -117,7 +117,7 @@ namespace SmartDataHub.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "IpAddress", inputMonitoring.SmartAgentId);
+            ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name", inputMonitoring.SmartAgentId);
             return View(inputMonitoring);
         }
 

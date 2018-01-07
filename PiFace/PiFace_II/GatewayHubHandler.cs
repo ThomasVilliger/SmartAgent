@@ -21,8 +21,9 @@ namespace PiFace_II
         public IDevice Device;
         //private  ThreadPoolTimer _heartbeatWatchdog;
         private int _smartAgentId;
-        private Dictionary<int, string> _gatewayHubsIPs;
-        private int _gatewayHubPriority = 1;
+        private int _smartAgentPriority = 0;
+
+        private List<SmartAgent> _smartAgents;
 
 
         public GatewayHubHandler(IDevice device)
@@ -31,8 +32,7 @@ namespace PiFace_II
 
             InputMonitorings = new List<InputMonitoring>();
             Device = device;
-            EstablishHubConnection();
-
+            
             LoadSmartAgentConfiguration();
         }
 
@@ -40,6 +40,10 @@ namespace PiFace_II
 
         public void LoadSmartAgentConfiguration()
         {
+
+            _smartAgents = DataAccess.SmartAgents();
+            EstablishHubConnection();
+
             foreach (Machine c in Machines)
             {
                 c.StopMachineDataGeneration();
@@ -70,52 +74,73 @@ namespace PiFace_II
         }
 
 
-        private async Task ReEstablishHubConnection(Exception ex)
-        {
-            _gatewayHub.DisposeAsync();
-            EstablishHubConnection();
-            //ResetHeartbeatWatchdogTimer();
-        }
 
 
+     
         private async Task EstablishHubConnection()
         {
+                _gatewayHub?.DisposeAsync();
 
-
-            string url = String.Format(@"http://{0}:59162/GatewayHub", _gatewayHubsIPs.GetValueOrDefault(_gatewayHubPriority)) ;
-            _gatewayHub = new HubConnectionBuilder().WithUrl(url).Build();
-
-            //_gatewayHub.On<string>("TestSmartAgentConnection", p => TestSmartAgentConnection(p));
-            //_gatewayHub.On<bool>("GetAllSmartAgentConnections", p => GetAllSmartAgentConnections(p));
-            //_hub.On<bool>("Heartbeat", p => Heartbeat(p));
-
-            _gatewayHub.Closed -= ReEstablishHubConnection;
-            _gatewayHub.Closed += ReEstablishHubConnection;
-
-            await _gatewayHub.StartAsync().ContinueWith(async task =>
-            {
-                if (task.IsFaulted || task.IsCanceled)
+                string url;
+                if (_smartAgents.Any())
                 {
-                    ++_gatewayHubPriority;                
-                    ReEstablishHubConnection(null);
+                    url = String.Format(@"http://{0}:59162/GatewayHub", _smartAgents[_smartAgentPriority].IpAddress);
                 }
+
                 else
                 {
-                 bool  isCurrentGateway =  await   _gatewayHub.InvokeAsync<bool>("CheckIfIsCurrentGateway");
-
-                    if(!isCurrentGateway)
-                    {
-                        ++_gatewayHubPriority;
-                        ReEstablishHubConnection(null);
-                    }             
+                    url = String.Format(@"http://localhost:59162/GatewayHub");
                 }
 
-                if (_gatewayHubPriority > _gatewayHubsIPs.Count)
-                {
-                    _gatewayHubPriority = 1;
-                }
-            });
+                _gatewayHub = new HubConnectionBuilder().WithUrl(url).Build();
+
+                //_gatewayHub.On<string>("TestSmartAgentConnection", p => TestSmartAgentConnection(p));
+                //_gatewayHub.On<bool>("GetAllSmartAgentConnections", p => GetAllSmartAgentConnections(p));
+                //_hub.On<bool>("Heartbeat", p => Heartbeat(p));
+
+
+
+                await _gatewayHub.StartAsync().ContinueWith(async task =>
+               {
+                   if (task.IsFaulted || task.IsCanceled)
+                   {
+                       await TryNextGatewayHub();
+                   }
+                   else
+                   {
+                       bool isCurrentGateway = await _gatewayHub.InvokeAsync<bool>("CheckIfIsCurrentGateway");
+
+                       if (!isCurrentGateway)
+                       {
+                           await TryNextGatewayHub();
+                       }
+                       else
+                       {
+                           _gatewayHub.Closed -= ReEstablishHubConnection;
+                           _gatewayHub.Closed += ReEstablishHubConnection;
+                       }                    
+                   }
+               });
         }
+
+
+
+        private async Task ReEstablishHubConnection(Exception ex)
+        {
+            await EstablishHubConnection();
+        }
+
+        private async Task TryNextGatewayHub()
+        {
+            ++_smartAgentPriority;
+
+            if (_smartAgentPriority >= _smartAgents.Count)
+            {
+                _smartAgentPriority = 0;
+            }
+           await EstablishHubConnection();
+        }
+
 
 
         private void GetAllSmartAgentConnections(bool p)
@@ -125,19 +150,19 @@ namespace PiFace_II
 
             foreach (IPAddress ipOfTheSmartAgent in hostInfo.AddressList)
             {
-                _gatewayHub.InvokeAsync("ReturnSmartAgentConnection", hostName, ipOfTheSmartAgent.ToString());
+                _gatewayHub?.InvokeAsync("ReturnSmartAgentConnection", hostName, ipOfTheSmartAgent.ToString());
             }
         }
 
         private void TestSmartAgentConnection(string p)
         {
-            _gatewayHub.InvokeAsync("TestSmartAgentConnectionResponse", true);
+            _gatewayHub?.InvokeAsync("TestSmartAgentConnectionResponse", true);
         }
 
 
         public void InitializeNewMachineConfigurations(List<MachineConfiguration> machinesConfigurations)
         {
-            DataAccess.MachinesConfigurations(machinesConfigurations);
+            DataAccess.StoreMachinesConfigurations(machinesConfigurations);
         }
 
 
@@ -151,7 +176,7 @@ namespace PiFace_II
 
         public void NewHistoryDataNotification()
         {
-            _gatewayHub.InvokeAsync("NewHistoryDataNotification", _smartAgentId);
+            _gatewayHub?.InvokeAsync("NewHistoryDataNotification", _smartAgentId);
         }
 
         public void PublishActualMachineData(Machine machine)
@@ -166,7 +191,7 @@ namespace PiFace_II
                 StateDuration = machine.StateDuration.ToString(@"dd\.hh\:mm\:ss")
             };
 
-            _gatewayHub.InvokeAsync("PublishActualMachineData", actualMachineData);
+            _gatewayHub?.InvokeAsync("PublishActualMachineData", actualMachineData);
         }
     }
 }

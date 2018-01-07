@@ -109,6 +109,8 @@ namespace SmartDataHub.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
+                    b.Property<int>("Priority");
+
                     b.HasKey("SmartAgentId");
 
                     b.ToTable("SmartAgent");

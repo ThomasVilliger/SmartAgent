@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Timers;
 using System.Net;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace SmartDataHub
 {
@@ -60,6 +61,7 @@ namespace SmartDataHub
             {
                 await InitializeMachinesOnSmartAgent(ip, smartAgentId);
                 await InitializeInputMonitoringsOnSmartAgent(ip, smartAgentId);
+                await RegisterSmartAgentsOnSmartAgent(ip);
                 await SignSmartAgent(ip, smartAgentId);
             }
 
@@ -75,22 +77,19 @@ namespace SmartDataHub
         private async Task InitializeMachinesOnSmartAgent(string ip, int smartAgentId)
         {
             var values = DataAccess.GetMachines(smartAgentId);
-            var jsonContent = JsonConvert.SerializeObject(values);
-            var stringContent = new StringContent(jsonContent.ToString());
 
             string url = String.Format(@"http://{0}:8800/api/initializeNewMachines", ip);
-            var response = await client.PutAsync(url, stringContent);
+            var response = await client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
             if (success)
             {
-                var message = String.Format("Machine configs  successfully written to {0}", ip);
-                var configuredMachines = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
-                var defaultMessage = "no machines configured for this SmartAgent";
-
+                var message = String.Format("Machine configs  successfully written to {0}", ip);              
                 SmartAgentConfigurationResponse(true, message, null, true, false);
-                SmartAgentConfigurationResponse(true, configuredMachines, defaultMessage, false, false);
+
+                var defaultMessage = "no machines configured for this SmartAgent";
+                ConfigResponse(responseMessage, defaultMessage);
             }
 
             else
@@ -101,25 +100,70 @@ namespace SmartDataHub
             }
         }
 
+        private StringContent GetHttpStringContent(object values)
+        {
+            var jsonContent = JsonConvert.SerializeObject(values);
+            return new StringContent(jsonContent.ToString());
+        }
+
+
+
+
+
+
+        private async Task RegisterSmartAgentsOnSmartAgent(string ip)
+        {
+            var values = DataAccess.GetSmartAgents();
+
+            string url = String.Format(@"http://{0}:8800/api/registerSmartAgents", ip);
+            var response = await client.PutAsync(url, GetHttpStringContent(values));
+            var responseMessage = await response.Content.ReadAsStringAsync(); //right!
+            var success = response.IsSuccessStatusCode;
+
+
+            if (success)
+            {
+                var message = String.Format("The SmartAgent has the following SmartAgents registered:");            
+                SmartAgentConfigurationResponse(true, message, null, true, false);
+
+                var defaultMessage = "no SmartAgents configured";
+                ConfigResponse(responseMessage, defaultMessage);
+            }
+
+            else
+            {
+                var message = responseMessage;
+                var defaultMessage = "Failed to register SmartAgents on SmartAgent";
+                SmartAgentConfigurationResponse(false, message, defaultMessage, false, false);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
         private async Task InitializeInputMonitoringsOnSmartAgent(string ip, int smartAgentId)
         {
             var values = DataAccess.GetInputMonitorings(smartAgentId);
-            var jsonContent = JsonConvert.SerializeObject(values);
-            var stringContent = new StringContent(jsonContent.ToString());
 
             string url = String.Format(@"http://{0}:8800/api/initializeNewInputMonitorings", ip);
-            var response = await client.PutAsync(url, stringContent);
+            var response = await client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
             if (success)
             {
                 var message = String.Format("Input monitoring configs  successfully written to {0}", ip);
-                var configuredInputMonitorings = Environment.NewLine + JsonConvert.SerializeObject(responseMessage);
-                var defaultMessage = "no input Monitorings configured for this SmartAgent";
-
                 SmartAgentConfigurationResponse(true, message, null, true, false);
-                SmartAgentConfigurationResponse(true, configuredInputMonitorings, defaultMessage, false, false);
+
+                var defaultMessage = "no input Monitorings configured for this SmartAgent";
+                ConfigResponse(responseMessage, defaultMessage);
+                
             }
 
             else
@@ -130,14 +174,30 @@ namespace SmartDataHub
             }
         }
 
+
+        private void ConfigResponse(string responseMessage, string defaultMessage)
+        {
+            if (responseMessage.Contains("[]"))
+            {
+                responseMessage = String.Empty;
+                SmartAgentConfigurationResponse(true, responseMessage, defaultMessage, false, false);
+            }
+            else
+            {
+                var configs = Regex.Split(responseMessage, @"(?<=},)");
+                foreach (string config in configs)
+                {
+                    SmartAgentConfigurationResponse(true, config, null, false, false);
+                }
+            }
+        }
+
         private async Task SignSmartAgent(string ip, int smartAgentId)
         {
             var values = smartAgentId;
-            var jsonContent = JsonConvert.SerializeObject(values);
-            var stringContent = new StringContent(jsonContent.ToString());
 
             string url = String.Format(@"http://{0}:8800/api/signSmartAgentAndLoadConfiguration", ip);
-            var response = await client.PutAsync(url, stringContent);
+            var response = await client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 

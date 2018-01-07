@@ -53,8 +53,12 @@ namespace SmartDataHub
             app.UseSignalR(routes =>
             {
                 routes.MapHub<SmartDataSignalRhub>("SmartDataSignalRhub");
-     
+            });
 
+
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ReportHub>("ReportHub");
             });
 
             app.UseMvc(routes =>

@@ -130,7 +130,7 @@ namespace Restup.DemoControllers
         {
             try
             {
-                DataAccess.MachinesConfigurations(configs);
+                DataAccess.StoreMachinesConfigurations(configs);
                 return new PutResponse(PutResponse.ResponseStatus.OK, configs);
             }
 
@@ -140,7 +140,7 @@ namespace Restup.DemoControllers
             }
         }
 
-
+       
 
         [UriFormat("/initializeNewInputMonitorings/")]
         public IPutResponse InitializeNewInputMonitorings([FromContent] List<InputMonitoringConfiguration> configs)
@@ -158,7 +158,23 @@ namespace Restup.DemoControllers
         }
 
 
-                [UriFormat("/signSmartAgentAndLoadConfiguration/")]
+        [UriFormat("/registerSmartAgents/")]
+        public IPutResponse SetSmartAgents([FromContent] List<SmartAgent> configs)
+        {
+            try
+            {
+                DataAccess.StoreSmartAgents(configs);
+                return new PutResponse(PutResponse.ResponseStatus.OK, configs);
+            }
+
+            catch (Exception ex)
+            {
+                return new PutResponse(PutResponse.ResponseStatus.NotFound, ex.Message);
+            }
+        }
+
+
+        [UriFormat("/signSmartAgentAndLoadConfiguration/")]
         public IPutResponse SignSmartAgent([FromContent] int smartAgentId)
         {
             try

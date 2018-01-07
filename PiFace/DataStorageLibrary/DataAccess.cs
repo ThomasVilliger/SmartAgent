@@ -26,19 +26,19 @@ namespace DataStorageLibrary
 
 
                 tableCommand = "CREATE TABLE IF NOT " +
-"EXISTS  InputMonitoring ( Id INTEGER PRIMARY KEY AUTOINCREMENT, InputPin INTEGER NOT NULL, OutputPin INTEGER NOT NULL)";
+               "EXISTS  InputMonitoring ( Id INTEGER PRIMARY KEY AUTOINCREMENT, InputPin INTEGER NOT NULL, OutputPin INTEGER NOT NULL)";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
 
                 tableCommand = "CREATE TABLE IF NOT " +
                 "EXISTS  SmartAgentIdentification (SmartAgentId INTEGER NOT NULL)";
-                 createTable = new SqliteCommand(tableCommand, db);
+                createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
 
                 tableCommand = "CREATE TABLE IF NOT " +
-                "EXISTS  GatewayHub ( Id INTEGER PRIMARY KEY AUTOINCREMENT, Priority INTEGER NOT NULL, IpAddress TEXT NOT NULL)";
+                "EXISTS  SmartAgent ( Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL , IpAddress TEXT NOT NULL, Priority INTEGER NOT NULL)";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
@@ -59,7 +59,7 @@ namespace DataStorageLibrary
 
         public static void AddDataMachineStateHistory(MachineStateHistory m)
         {
-           
+
 
 
             using (SqliteConnection db =
@@ -94,7 +94,7 @@ namespace DataStorageLibrary
 
         public static void SignSmartAgent(int smartAgentId)
         {
-  
+
 
 
             using (SqliteConnection db =
@@ -127,7 +127,7 @@ namespace DataStorageLibrary
         }
 
 
-        public static List<MachineConfiguration> GetMachineConfigurations ()
+        public static List<MachineConfiguration> GetMachineConfigurations()
         {
 
             var configs = new List<MachineConfiguration>();
@@ -143,26 +143,26 @@ namespace DataStorageLibrary
                 command.Connection = db;
 
                 command.CommandText = "select *from Machine";
-              SqliteDataReader reader =  command.ExecuteReader();
+                SqliteDataReader reader = command.ExecuteReader();
 
 
                 while (reader.Read())
                 {
                     configs.Add(new MachineConfiguration
-                    {                  
-                       MachineId= Convert.ToInt32(reader["MachineId"]),
-                       MachineName = reader["MachineName"].ToString(),
-                       CycleInputPin=Convert.ToInt32(reader["CycleInputPin"]),
-                       MachineStateTimeout= Convert.ToInt32(reader["MachineStateTimeout"]),
-                       PublishingIntervall= Convert.ToInt32(reader["PublishingIntervall"])
+                    {
+                        MachineId = Convert.ToInt32(reader["MachineId"]),
+                        MachineName = reader["MachineName"].ToString(),
+                        CycleInputPin = Convert.ToInt32(reader["CycleInputPin"]),
+                        MachineStateTimeout = Convert.ToInt32(reader["MachineStateTimeout"]),
+                        PublishingIntervall = Convert.ToInt32(reader["PublishingIntervall"])
 
-                });
+                    });
 
                 }
                 db.Close();
                 return configs;
 
-                
+
             }
         }
 
@@ -196,7 +196,7 @@ namespace DataStorageLibrary
                         {
                             SmartAgentHistoryId = Convert.ToInt32(reader["Id"]),
                             MachineId = Convert.ToInt32(reader["MachineId"]),
-                            MachineState = (MachineStateHistory.State)  Convert.ToInt32(reader["MachineState"]),
+                            MachineState = (MachineStateHistory.State)Convert.ToInt32(reader["MachineState"]),
                             StartDateTime = Convert.ToDateTime(reader["StartDateTime"].ToString()),
                             EndDateTime = Convert.ToDateTime(reader["EndDateTime"].ToString()),
                             CyclesInThisPeriod = Convert.ToInt32(reader["CyclesInThisPeriod"]),
@@ -209,7 +209,7 @@ namespace DataStorageLibrary
 
                 }
 
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     throw ex;
                 }
@@ -266,8 +266,43 @@ namespace DataStorageLibrary
                 }
                 db.Close();
                 return configs;
+            }
+        }
 
 
+        public static List<SmartAgent> SmartAgents()
+        {
+
+            var configs = new List<SmartAgent>();
+
+
+            using (SqliteConnection db =
+    new SqliteConnection("Filename=SmartAgent.db"))
+            {
+                db.Open();
+
+
+                SqliteCommand command = new SqliteCommand();
+                command.Connection = db;
+
+                command.CommandText = "select *from SmartAgent";
+                SqliteDataReader reader = command.ExecuteReader();
+
+
+                while (reader.Read())
+                {
+                    configs.Add(new SmartAgent
+                    {
+                        Name = reader["Name"].ToString(),
+                        IpAddress = reader["IpAddress"].ToString(),
+                        Priority = Convert.ToInt32(reader["Priority"])
+                    });
+                }
+
+                db.Close();
+
+                configs.OrderBy(c => c.Priority);
+                return configs;
             }
         }
 
@@ -317,11 +352,11 @@ namespace DataStorageLibrary
 
 
 
-        public static void MachinesConfigurations(List<MachineConfiguration> machinesConfigurations)
+        public static void StoreMachinesConfigurations(List<MachineConfiguration> machinesConfigurations)
         {
 
-         using (SqliteConnection db =
-         new SqliteConnection("Filename=SmartAgent.db"))
+            using (SqliteConnection db =
+            new SqliteConnection("Filename=SmartAgent.db"))
             {
                 db.Open();
 
@@ -331,30 +366,65 @@ namespace DataStorageLibrary
                 deleteAllCommand.CommandText = "delete from Machine";
                 deleteAllCommand.ExecuteReader();
 
-               
 
 
-                    foreach (MachineConfiguration config in machinesConfigurations)
-                    {
 
-                        SqliteCommand insertCommand = new SqliteCommand();
-                        insertCommand.Connection = db;
-                        insertCommand.CommandText = "INSERT INTO Machine VALUES (NULL, @MachineId, @MachineName, @CycleInputPin, @MachineStateTimeout, @PublishingIntervall);";
+                foreach (MachineConfiguration config in machinesConfigurations)
+                {
 
-                            insertCommand.Parameters.AddWithValue("@MachineId", config.MachineId);
-                            insertCommand.Parameters.AddWithValue("@MachineName", config.MachineName);
-                            insertCommand.Parameters.AddWithValue("@CycleInputPin", config.CycleInputPin);
-                            insertCommand.Parameters.AddWithValue("@MachineStateTimeout", config.MachineStateTimeout);
-                            insertCommand.Parameters.AddWithValue("@PublishingIntervall", config.PublishingIntervall);
+                    SqliteCommand insertCommand = new SqliteCommand();
+                    insertCommand.Connection = db;
+                    insertCommand.CommandText = "INSERT INTO Machine VALUES (NULL, @MachineId, @MachineName, @CycleInputPin, @MachineStateTimeout, @PublishingIntervall);";
 
-                            insertCommand.ExecuteReader();
-                        
-                    }
+                    insertCommand.Parameters.AddWithValue("@MachineId", config.MachineId);
+                    insertCommand.Parameters.AddWithValue("@MachineName", config.MachineName);
+                    insertCommand.Parameters.AddWithValue("@CycleInputPin", config.CycleInputPin);
+                    insertCommand.Parameters.AddWithValue("@MachineStateTimeout", config.MachineStateTimeout);
+                    insertCommand.Parameters.AddWithValue("@PublishingIntervall", config.PublishingIntervall);
 
-
+                    insertCommand.ExecuteReader();
+                }
                 db.Close();
             }
+        }
 
+
+
+
+
+
+
+        public static void StoreSmartAgents(List<SmartAgent> smartAgents)
+        {
+
+            using (SqliteConnection db =
+            new SqliteConnection("Filename=SmartAgent.db"))
+            {
+                db.Open();
+
+                SqliteCommand deleteAllCommand = new SqliteCommand();
+                deleteAllCommand.Connection = db;
+
+                deleteAllCommand.CommandText = "delete from SmartAgent";
+                deleteAllCommand.ExecuteReader();
+
+
+                foreach (SmartAgent config in smartAgents)
+                {
+
+                    SqliteCommand insertCommand = new SqliteCommand();
+                    insertCommand.Connection = db;
+                    insertCommand.CommandText = "INSERT INTO SmartAgent VALUES (NULL, @Name, @IpAddress, @Priority);";
+
+                    insertCommand.Parameters.AddWithValue("@Name", config.Name);
+                    insertCommand.Parameters.AddWithValue("@IpAddress", config.IpAddress);
+                    insertCommand.Parameters.AddWithValue("@Priority", config.Priority);
+
+                    insertCommand.ExecuteReader();
+
+                }
+                db.Close();
+            }
         }
 
 
@@ -372,7 +442,7 @@ namespace DataStorageLibrary
                 deleteAllCommand.CommandText = "delete from InputMonitoring";
                 deleteAllCommand.ExecuteReader();
 
-               
+
 
 
                 foreach (InputMonitoringConfiguration config in inputMonitoringConfigurations)
@@ -385,7 +455,7 @@ namespace DataStorageLibrary
 
                     insertCommand.Parameters.AddWithValue("@InputPin", config.InputPin);
                     insertCommand.Parameters.AddWithValue("@OutputPin", config.OutputPin);
- 
+
                     insertCommand.ExecuteReader();
                 }
 

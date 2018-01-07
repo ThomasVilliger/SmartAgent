@@ -13,7 +13,7 @@ namespace SmartDataHub.Models
         public SmartDataHubStorageContext (DbContextOptions<SmartDataHubStorageContext> options)
             : base(options)
         {
-            DataAccess.DbContextOptions = options;
+            //DataAccess.DbContextOptions = options;
         }
 
         public DbSet<SmartDataHub.Models.Machine> Machine { get; set; }

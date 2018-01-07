@@ -19,28 +19,25 @@ namespace DeviceMonitoring
     public  class GatewayHub : Hub
     {
         private static IHubClients _clients;
-        //private static Timer _heartbeatTimer = new Timer(3000);
+        private static Timer _heartbeatWatchdog = new Timer(10000);
         private static int _connectionCounter;
         private static bool isCurrentGateway = true;
 
 
 
 
-        //public GatewayHub()
-        //{
-        //    _heartbeatTimer.Elapsed -= Hearthbeat;
-        //    _heartbeatTimer.Elapsed += Hearthbeat;
-        //    _heartbeatTimer.AutoReset = true;
-        //    _heartbeatTimer.Start();
-        //}
+        public GatewayHub()
+        {
+            _heartbeatWatchdog.Elapsed -= NoHeartbeat;
+            _heartbeatWatchdog.Elapsed += NoHeartbeat;
+            //_heartbeatWatchdog.AutoReset = true;
+            _heartbeatWatchdog.Start();
+        }
 
-        //private static void Hearthbeat(Object source, ElapsedEventArgs e)
-        //{
-        //    if (_clients != null)
-        //    {
-        //        _clients.All.InvokeAsync("Heartbeat", true);
-        //    }
-        //}
+        private static void NoHeartbeat(Object source, ElapsedEventArgs e)
+        {
+            isCurrentGateway = true;
+        }
 
         public async Task PublishActualMachineData(object actualMachineData)
 
@@ -57,6 +54,13 @@ namespace DeviceMonitoring
         public async Task<bool> CheckIfIsCurrentGateway()
         {
             return isCurrentGateway;
+        }
+
+        public void Heartbeat ()
+        {
+            _heartbeatWatchdog.Stop();
+            _heartbeatWatchdog.Start();
+            isCurrentGateway = true;
         }
 
 
