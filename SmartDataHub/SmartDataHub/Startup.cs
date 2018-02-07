@@ -27,9 +27,15 @@ namespace SmartDataHub
             services.AddMvc();
             services.AddSignalR();
 
+
+            var optionsBuilder = new DbContextOptionsBuilder<SmartDataHubStorageContext>().UseSqlServer(Configuration.GetConnectionString("SmartDataHubContext"));
+
+            DataAccess.Initialize(optionsBuilder.Options);
+
             services.AddDbContext<SmartDataHubStorageContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("SmartDataHubContext")));
 
+            
            
         }
 

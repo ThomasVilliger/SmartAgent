@@ -33,7 +33,7 @@ namespace SmartDataHub
             _heartbeatTimer.AutoReset = true;
             _heartbeatTimer.Start();
 
-            DataAccess.Initialize();
+         
 
           await  EstablishGatewayHubConnection(null);
         }
