@@ -18,14 +18,12 @@ namespace SmartDataHub.Controllers
             _context = context;
         }
 
-        // GET: InputMonitoringConfigurations
         public async Task<IActionResult> Index()
         {
             var smartDataHubStorageContext = _context.InputMonitoring.Include(i => i.SmartAgent);
             return View(await smartDataHubStorageContext.ToListAsync());
         }
 
-        // GET: InputMonitoringConfigurations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,16 +42,12 @@ namespace SmartDataHub.Controllers
             return View(inputMonitoring);
         }
 
-        // GET: InputMonitoringConfigurations/Create
         public IActionResult Create()
         {
             ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name");
             return View();
         }
 
-        // POST: InputMonitoringConfigurations/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InputMonitoringId,SmartAgentId,MonitoringName,InputPin,OutputPin,Active")] InputMonitoring inputMonitoring)
@@ -68,7 +62,6 @@ namespace SmartDataHub.Controllers
             return View(inputMonitoring);
         }
 
-        // GET: InputMonitoringConfigurations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -85,9 +78,6 @@ namespace SmartDataHub.Controllers
             return View(inputMonitoring);
         }
 
-        // POST: InputMonitoringConfigurations/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("InputMonitoringId,SmartAgentId,MonitoringName,InputPin,OutputPin,Active")] InputMonitoring inputMonitoring)
@@ -121,7 +111,6 @@ namespace SmartDataHub.Controllers
             return View(inputMonitoring);
         }
 
-        // GET: InputMonitoringConfigurations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,7 +129,6 @@ namespace SmartDataHub.Controllers
             return View(inputMonitoring);
         }
 
-        // POST: InputMonitoringConfigurations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

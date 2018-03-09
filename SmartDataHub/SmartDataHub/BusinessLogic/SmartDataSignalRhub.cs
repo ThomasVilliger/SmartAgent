@@ -1,23 +1,18 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using System.Timers;
 using System.Net;
 using System.Threading;
 using System.Text.RegularExpressions;
 
 namespace SmartDataHub
 {
+    // the signalR Hub of this website
     public class SmartDataSignalRhub : Hub
     {
-        private static readonly HttpClient client = new HttpClient();
+        private static readonly HttpClient _client = new HttpClient();
         public static IHubClients SmartDataHubClients;
 
         public async Task TestSmartAgentConnection(string ip)
@@ -28,9 +23,8 @@ namespace SmartDataHub
                 cts.CancelAfter(100);
                 CancellationToken ct = cts.Token;
 
-
                 string url = String.Format(@"http://{0}:8800/api/testSmartAgentConnection", ip);
-                var response = await client.GetAsync(url, ct);
+                var response = await _client.GetAsync(url, ct);
                 var responseMessage = await response.Content.ReadAsStringAsync();
                 var success = response.IsSuccessStatusCode;
 
@@ -54,7 +48,6 @@ namespace SmartDataHub
             }
         }
 
-
         public async void InitializeSmartAgentConfigurations(string ip, int smartAgentId)
         {
             try
@@ -72,20 +65,18 @@ namespace SmartDataHub
             }
         }
 
-
-
         private async Task InitializeMachinesOnSmartAgent(string ip, int smartAgentId)
         {
             var values = DataAccess.GetMachines(smartAgentId);
 
             string url = String.Format(@"http://{0}:8800/api/initializeNewMachines", ip);
-            var response = await client.PutAsync(url, GetHttpStringContent(values));
+            var response = await _client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
             if (success)
             {
-                var message = String.Format("Machine configs  successfully written to {0}", ip);              
+                var message = String.Format("Machine configs  successfully written to {0}", ip);
                 SmartAgentConfigurationResponse(true, message, null, true, false);
 
                 var defaultMessage = "no machines configured for this SmartAgent";
@@ -106,24 +97,18 @@ namespace SmartDataHub
             return new StringContent(jsonContent.ToString());
         }
 
-
-
-
-
-
         private async Task RegisterSmartAgentsOnSmartAgent(string ip)
         {
             var values = DataAccess.GetSmartAgents();
 
             string url = String.Format(@"http://{0}:8800/api/registerSmartAgents", ip);
-            var response = await client.PutAsync(url, GetHttpStringContent(values));
+            var response = await _client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
-
             if (success)
             {
-                var message = String.Format("The SmartAgent has the following SmartAgents registered:");            
+                var message = String.Format("The SmartAgent has the following SmartAgents registered:");
                 SmartAgentConfigurationResponse(true, message, null, true, false);
 
                 var defaultMessage = "no SmartAgents configured";
@@ -138,21 +123,12 @@ namespace SmartDataHub
             }
         }
 
-
-
-
-
-
-
-
-
-
         private async Task InitializeInputMonitoringsOnSmartAgent(string ip, int smartAgentId)
         {
             var values = DataAccess.GetInputMonitorings(smartAgentId);
 
             string url = String.Format(@"http://{0}:8800/api/initializeNewInputMonitorings", ip);
-            var response = await client.PutAsync(url, GetHttpStringContent(values));
+            var response = await _client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
@@ -163,7 +139,7 @@ namespace SmartDataHub
 
                 var defaultMessage = "no input Monitorings configured for this SmartAgent";
                 ConfigResponse(responseMessage, defaultMessage);
-                
+
             }
 
             else
@@ -197,7 +173,7 @@ namespace SmartDataHub
             var values = smartAgentId;
 
             string url = String.Format(@"http://{0}:8800/api/signSmartAgentAndLoadConfiguration", ip);
-            var response = await client.PutAsync(url, GetHttpStringContent(values));
+            var response = await _client.PutAsync(url, GetHttpStringContent(values));
             var responseMessage = await response.Content.ReadAsStringAsync(); //right!
             var success = response.IsSuccessStatusCode;
 
@@ -234,7 +210,6 @@ namespace SmartDataHub
 
         public async Task BroadcastSearchSmartAgents()
         {
-
             string hostName = Dns.GetHostName();
             IPHostEntry hostInfo = Dns.GetHostEntry(hostName);
             bool anySmartAgentFound = false;
@@ -263,7 +238,7 @@ namespace SmartDataHub
                             try
                             {
                                 string url = String.Format(@"http://{0}:8800/api/testSmartAgentConnection", ipAddress.ToString());
-                                var response = await client.GetAsync(url, ct);
+                                var response = await _client.GetAsync(url, ct);
 
                                 anySmartAgentFound = true;
                                 var smessage = String.Format("Connection to SmartAgent {0} successfull", ipAddress.ToString());
@@ -289,11 +264,6 @@ namespace SmartDataHub
                 SmartAgentConfigurationResponse(true, message, null, false, false);
             }
         }
-
-
-
-
-
 
         public override Task OnConnectedAsync()
         {

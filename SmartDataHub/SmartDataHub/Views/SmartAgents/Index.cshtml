@@ -1,19 +1,14 @@
 ﻿@model IEnumerable<SmartDataHub.Models.SmartAgent>
 
-
-
 <head>
     <script src="~/lib/SignalR/signalr-client-1.0.0-alpha2-final.min.js"></script>
     <script src="~/lib/jquery/dist/jquery.js"></script>
-
     <link href="~/css/allViews.css" rel="stylesheet" />
     <link href="~/css/smartAgentConfiguration.css" rel="stylesheet" />
 </head>
 
-
 <script>
     $(document).ready(function () {
-
         let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
 
         hubConnection.on('SmartAgentConfigurationResponse', function (isSuccess, message, isGreenColored, isHeader) {
@@ -44,14 +39,12 @@
 
 
         hubConnection.on('NoConnectionToGatewayHub', function () {
-            $("#connectionState").text("no connection to main server");
+            $("#connectionState").text("no connection to master SmartAgent");
         });
-
 
         hubConnection.on('ConnectionToGatewayHubEstablished', function () {
             $("#connectionState").text("");
         });
-
 
         $(".testSmartAgentConnection").click(function () {
             var smartAgentIpAddress = this.value
@@ -62,7 +55,6 @@
             hubConnection.invoke('TestSmartAgentConnection', smartAgentIpAddress);
         });
 
-
         $(".openWebinterface").click(function () {
             var smartAgentIpAddress = this.value
             var port = ":59162";
@@ -71,7 +63,6 @@
             window.open(url);
         });
 
-
         $("#searchSmartAgents").click(function () {
             $("#infos >p").remove();
             var text = "searching availabe SmartAgents in network...";
@@ -79,7 +70,6 @@
 
             hubConnection.invoke('BroadcastSearchSmartAgents');
         });
-
 
         $(".initializeConfiguration").click(function () {
             $("#infos >p").remove();
@@ -95,7 +85,6 @@
         hubConnection.start();
     });
 </script>
-
 
 @{
     ViewData["Title"] = "Index";
@@ -143,13 +132,12 @@
                 </td>
                 <td>
                     <a asp-action="Edit" asp-route-id="@item.SmartAgentId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.SmartAgentId">Details</a> |
+                    @*<a asp-action="Details" asp-route-id="@item.SmartAgentId">Details</a> |*@
                     <a asp-action="Delete" asp-route-id="@item.SmartAgentId">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
 <div id="infosHeader"></div>
 <div id="infos"></div>

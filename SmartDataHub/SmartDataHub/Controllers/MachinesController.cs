@@ -18,15 +18,14 @@ namespace SmartDataHub.Controllers
 
             _context = context;
         }
-
-        // GET: CycleMachineConfigurations
+       
         public async Task<IActionResult> Index()
         {
             var smartDataHubStorageContext = _context.Machine.Include(c => c.SmartAgent);
             return View(await smartDataHubStorageContext.ToListAsync());
         }
 
-        // GET: CycleMachineConfigurations/Details/5
+     
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -45,16 +44,12 @@ namespace SmartDataHub.Controllers
             return View(machine);
         }
 
-        // GET: CycleMachineConfigurations/Create
         public IActionResult Create()
         {
             ViewData["SmartAgentId"] = new SelectList(_context.SmartAgent, "SmartAgentId", "Name"); // Change IpAddress TO Name!!!!
             return View();
         }
 
-        // POST: CycleMachineConfigurations/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("MachineId,SmartAgentId,MachineName,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] Machine machine)
@@ -69,7 +64,7 @@ namespace SmartDataHub.Controllers
             return View(machine);
         }
 
-        // GET: CycleMachineConfigurations/Edit/5
+
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,9 +81,7 @@ namespace SmartDataHub.Controllers
             return View(machine);
         }
 
-        // POST: CycleMachineConfigurations/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("MachineId,SmartAgentId,MachineName,CycleInputPin,MachineStateTimeOut,PublishingIntervall,Active")] Machine machine)
@@ -122,7 +115,6 @@ namespace SmartDataHub.Controllers
             return View(machine);
         }
 
-        // GET: CycleMachineConfigurations/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -141,7 +133,6 @@ namespace SmartDataHub.Controllers
             return View(machine);
         }
 
-        // POST: CycleMachineConfigurations/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

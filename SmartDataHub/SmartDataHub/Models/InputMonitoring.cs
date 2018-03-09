@@ -11,12 +11,19 @@ namespace SmartDataHub.Models
         [Required]
         public virtual int InputMonitoringId { get; set; }
         [Required]
+        [Display(Name = "SmartAgent")]
         public virtual int SmartAgentId { get; set; }
+
         [Required]
+        [Display(Name = "Name")]
         public virtual string MonitoringName { get; set; }
+
         [Required]
+        [Display(Name = "Input Pin")]
         public virtual int InputPin { get; set; }
+
         [Required]
+        [Display(Name = "Output Pin")]
         public virtual int OutputPin { get; set; }
        
         public virtual SmartAgent SmartAgent { get; set; }

@@ -74,7 +74,7 @@ namespace SmartDataHub
                     template: "{controller=Machines}/{action=Index}/{id?}");
             });
 
-            SmartDataSignalRclient.Initialize();
+            SignalRgatewayClient.Initialize();
         }
     }
 }

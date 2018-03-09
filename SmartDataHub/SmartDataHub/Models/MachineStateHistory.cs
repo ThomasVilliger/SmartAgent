@@ -18,20 +18,25 @@ namespace SmartDataHub.Models
         public int SmartAgentHistoryId { get; set; }
 
         [Required]
+        [Display(Name = "Machine Id")]
         public int MachineId { get; set; }
         public virtual Machine Machine { get; set; }
 
         [Required]
         public State MachineState { get; set; }
         [Required]
+        [Display(Name = "Start")]
         public DateTime StartDateTime { get; set; }
         [Required]
+        [Display(Name = "End")]
         public DateTime EndDateTime { get; set; }
         [Required]
         public TimeSpan Duration { get; set; }
         [Required]
+        [Display(Name = "Daily Cycle Counter")]
         public int DailyCycleCounter { get; set; }
         [Required]
+        [Display(Name = "State Cycle Counter")]
         public int CyclesInThisPeriod { get; set; }
 
 

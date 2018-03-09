@@ -1,17 +1,15 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using SmartDataHub.Models;
 
 namespace SmartDataHub
 {
+    // signalR Hub for the report site
     public class ReportHub : Hub
     {
-
         public async void ExecuteReport(int machineId, DateTime fromDate, DateTime toDate)
-        {         
+        {
             try
             {
                 fromDate = fromDate + TimeSpan.FromHours(1);
@@ -25,10 +23,6 @@ namespace SmartDataHub
             }
         }
 
-
-
-
-
         private async Task ReportResponse(int machineId, DateTime fromDate, DateTime toDate)
         {
             var historyData = DataAccess.GetMachineStateHistoryData(machineId, fromDate, toDate);
@@ -38,7 +32,7 @@ namespace SmartDataHub
                 string header = String.Format("report execution time: {0} ", DateTime.Now.ToString());
 
                 await Clients.All.InvokeAsync("ReportHeaderResponse", true, header);
-                await Clients.All.InvokeAsync("ReportDataResponse",  historyData);
+                await Clients.All.InvokeAsync("ReportDataResponse", historyData);
             }
 
             else
@@ -46,44 +40,8 @@ namespace SmartDataHub
                 string header = String.Format("no data for machine {0} {1}", machineId, DateTime.Now.ToString());
                 await Clients.Client(Context.ConnectionId).InvokeAsync("ReportHeaderResponse", true, header);
             }
-
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 

@@ -18,13 +18,11 @@ namespace SmartDataHub.Controllers
             _context = context;
         }
 
-        // GET: SmartAgents
         public async Task<IActionResult> Index()
         {
             return View(await _context.SmartAgent.ToListAsync());
         }
 
-        // GET: SmartAgents/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -42,15 +40,11 @@ namespace SmartDataHub.Controllers
             return View(smartAgent);
         }
 
-        // GET: SmartAgents/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: SmartAgents/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("SmartAgentId,Name,IpAddress")] SmartAgent smartAgent)
@@ -64,7 +58,6 @@ namespace SmartDataHub.Controllers
             return View(smartAgent);
         }
 
-        // GET: SmartAgents/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -80,9 +73,7 @@ namespace SmartDataHub.Controllers
             return View(smartAgent);
         }
 
-        // POST: SmartAgents/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("SmartAgentId,Name,IpAddress")] SmartAgent smartAgent)
@@ -115,7 +106,7 @@ namespace SmartDataHub.Controllers
             return View(smartAgent);
         }
 
-        // GET: SmartAgents/Delete/5
+        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,7 +124,7 @@ namespace SmartDataHub.Controllers
             return View(smartAgent);
         }
 
-        // POST: SmartAgents/Delete/5
+        
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

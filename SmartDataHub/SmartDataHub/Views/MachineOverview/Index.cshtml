@@ -3,36 +3,23 @@
     ViewData["Title"] = "Index";
 }
 
-
 <html>
 
 <head>
-    @*<meta name="viewport" content="width=device-width" />
-        <title>DeviceMonitoring</title>
-
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-        <link href="~/css/deviceMonitoring.css" rel="stylesheet" />
-        <script src="~/lib/signalr-client-1.0.0-alpha2-final.min.js"></script>*@
-
     <script src="~/lib/jquery/dist/jquery.js"></script>
     <link href="~/css/machineOverview.css" rel="stylesheet" />
     <script src="~/lib/SignalR/signalr-client-1.0.0-alpha2-final.min.js"></script>
     <link href="~/css/allViews.css" rel="stylesheet" />
 </head>
 
-
-
 <body>
-
-
 
     <script>
         $(document).ready(function () {
 
-
             let hubConnection = new signalR.HubConnection('/SmartDataSignalRhub');
 
-            hubConnection.on('PublishActualMachineData', function ( actualMachineData) {
+            hubConnection.on('PublishActualMachineData', function (actualMachineData) {
 
                 var machineId = actualMachineData.machineId;
 
@@ -56,7 +43,6 @@
                     $(idMachineState).addClass("machineStateRunning");
                 }
 
-
                 else if (actualMachineData.machineState == "Stopped") {
                     $(idMachineState).removeClass("machineStateLabel");
                     $(idMachineState).removeClass("machineStateRunning");
@@ -66,7 +52,6 @@
                     $(idMachineState).addClass("machineStateStopped");
                 }
 
-
                 else {
                     $(idMachineState).removeClass("machineStateLabel");
                     $(idMachineState).removeClass("machineStateRunning");
@@ -75,22 +60,13 @@
 
                     $(idMachineState).addClass("machineStateUnknown");
                 }
-
-
-
-
-
             });
-
-
-
 
             hubConnection.on('NoConnectionToGatewayHub', function () {
 
-                $("#connectionState").text("no connection to main server");
+                $("#connectionState").text("no connection to master SmartAgent");
 
             });
-
 
             hubConnection.on('ConnectionToGatewayHubEstablished', function () {
 
@@ -98,75 +74,35 @@
 
             });
 
+            hubConnection.start()
+                .then(() => {
+                    $(".machineStateLabel").addClass("machineStateUnknown");
 
-
-
-                 hubConnection.start()
-            .then(() => {
-                $(".machineStateLabel").addClass("machineStateUnknown");
-
-            });
-
-
-
+                });
         });
     </script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <h2>Machine Overview</h2>
     <h3 id="connectionState"></h3>
 
-
     @foreach (var item in Model)
     {
-
-
-
-
         <div id="machine-table" class="clear">
             <div class="plan">
                 <h3>@Html.DisplayFor(modelItem => item.MachineName)</h3>
                 <label id="machineState_@Html.DisplayFor(modelItem => item.MachineId)" class="machineStateLabel">Unknown</label>
 
                 <table>
-
                     <tr>
-
                         <td>
                             <b>Cycle Counter</b>
                         </td>
-
                         <td id="cycleCounterValue_@Html.DisplayFor(modelItem => item.MachineId)" class="cycleCounterValue">
                             -
                         </td>
-
                     </tr>
 
                     <tr>
-
                         <td>
                             <b>Cycle Time </b>
                         </td>
@@ -175,37 +111,17 @@
                             -
                         </td>
                     </tr>
-
                     <tr>
-
                         <td>
                             <b>State Duration </b>
                         </td>
-
                         <td id="stateDurationValue_@Html.DisplayFor(modelItem => item.MachineId)" class="stateDurationValue">
                             -
                         </td>
-
                     </tr>
-
-
                 </table>
-
-
-
             </div>
-
         </div>
-
-
-
-
-
-
-
     }
-
-
 </body>
 </html>
-

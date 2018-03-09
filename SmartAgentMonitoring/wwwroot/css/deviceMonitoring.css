@@ -1,0 +1,183 @@
+
+
+/* h1
+{
+    display: inline-block;
+}
+
+#clientCounter
+{
+    
+    text-align: right;
+    width: 30%;
+ 
+} */
+
+
+
+
+.ioTitle {
+    margin-top: 50px;
+}
+
+#ioTitleOutput {
+    margin-top: 280px;
+}
+
+button {
+    width: 100%;
+    min-width: 20%;
+    height: 30px;
+    padding: 0,0,0,0;
+    /* border: solid 2px black */
+}
+
+
+
+
+.inputTable {
+    width: 12%;
+    float: left;
+    min-width: 10%;
+}
+
+
+
+
+
+
+.inputBorderClass {
+    border: solid 1px #16a085;
+}
+
+.inputHead {
+    background-color: #16a080;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+}
+
+.inputIco {
+    text-align: center;
+    line-height: 70px;
+    background-color: #d8d8d8;
+    display: inline-block;
+    width: 100%;
+}
+
+    .inputIco i {
+        height: 50px;
+        width: 50px;
+        display: inline-block;
+        border-radius: 50%;
+        vertical-align: middle;
+        background-color: #16a085;
+        border: solid 3px #ffffff;
+    }
+
+
+
+
+
+
+.inputList {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+    .inputList ul {
+        margin: 0;
+        padding: 0;
+    }
+
+        .inputList ul li {
+            margin: 10px;
+            padding: 10px;
+            list-style-type: none;
+            display: block;
+            border-bottom: dashed 1px #BFBFBF;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.outputTable {
+    width: 12%;
+    float: left;
+    min-width: 10%;
+}
+
+.outputBorderClass {
+    border: solid 1px #F89406;
+}
+
+.outputHead {
+    background-color: #F89406;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+    display: inline-block;
+    width: 100%;
+}
+
+.outputIco {
+    text-align: center;
+    line-height: 70px;
+    background-color: #d8d8d8;
+    display: inline-block;
+    width: 100%;
+}
+
+    .outputIco i {
+        height: 50px;
+        width: 50px;
+        display: inline-block;
+        border-radius: 50%;
+        vertical-align: middle;
+        background-color: #F89406;
+        border: solid 3px #ffffff;
+    }
+
+
+.outputList {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+    .outputList ul {
+        margin: 0;
+        padding: 0;
+    }
+
+        .outputList ul li {
+            margin: 10px;
+            padding: 10px;
+            list-style-type: none;
+            display: block;
+            border-bottom: dashed 1px #BFBFBF;
+        }
+
+.io_on i {
+    background-color: red;
+}
+
+#title {
+    display: none;
+}
+

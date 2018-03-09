@@ -12,7 +12,6 @@ namespace SmartDataHub.Controllers
 {
     public class ReportController : Controller
     {
-
         private readonly SmartDataHubStorageContext _context;
 
         public ReportController(SmartDataHubStorageContext context)
@@ -20,17 +19,12 @@ namespace SmartDataHub.Controllers
             _context = context;
         }
 
-
         public async Task<IActionResult> Index()
         {
 
             ViewData["MachineId"] = new SelectList(_context.Machine, "MachineId", "MachineName");
 
             return View(new Machine());
-  
-        }
-
-
-
+          }
     }
 }
