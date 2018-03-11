@@ -32,22 +32,20 @@ namespace Restup.SmartAgent
         }
 
         [UriFormat("/setDeviceInput/")]
-        public IPutResponse SetDeviceInput([FromContent] Dictionary<string, string> parameters)
+        public IPutResponse SetDeviceInput([FromContent] PinState pinState)
         {
-            int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
-            bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
+           
+            //int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
+            //bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
 
-            _piFaceMain.Device.SetDeviceInput(pinNumber, state);
+            _piFaceMain.Device.SetDeviceInput(pinState.PinNumber, pinState.State);
             return new PutResponse(PutResponse.ResponseStatus.OK);
         }
 
         [UriFormat("/setDeviceOutput/")]
-        public IPutResponse SetDeviceOutput([FromContent] Dictionary<string, string> parameters)
+        public IPutResponse SetDeviceOutput([FromContent] PinState pinState)
         {
-            int pinNumber = Convert.ToInt32(parameters.FirstOrDefault(m => m.Key == "PinNumber").Value);
-            bool state = Convert.ToBoolean(parameters.FirstOrDefault(m => m.Key == "State").Value);
-
-            _piFaceMain.Device.SetDeviceOutput(pinNumber, state);
+            _piFaceMain.Device.SetDeviceOutput(pinState.PinNumber, pinState.State);
             return new PutResponse(PutResponse.ResponseStatus.OK);
         }
 

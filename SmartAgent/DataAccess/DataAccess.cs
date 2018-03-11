@@ -79,7 +79,7 @@ namespace DataAccess
 
                 db.Close();
 
-                TruncateMachineStateHistoryEntries(150);
+                //TruncateMachineStateHistoryEntries(150);
             }
         }
 

@@ -9,7 +9,7 @@ namespace DeviceMonitoring
 {
     // the signalR hub for the monitoring web client
     public class MonitoringHub : Hub
-    {   
+    {
         private IDeviceCommunication _deviceCommunication;
         private static IHubClients _clients;
 
@@ -20,45 +20,48 @@ namespace DeviceMonitoring
             //_deviceCommunication = new SignalRdeviceCommunication(this);
         }
 
-        public async  Task    SetDeviceInput(int pinNumber, bool state)
+        public async Task SetDeviceInput(int pinNumber, bool state)
         {
-        await _deviceCommunication.SetDeviceInput(pinNumber, state);
+            await _deviceCommunication.SetDeviceInput(new PinState {PinNumber = pinNumber, State = state });
         }
 
-        public async  Task SetDeviceOutput(int pinNumber, bool state)
+        public async Task SetDeviceOutput(int pinNumber, bool state)
         {
-            await _deviceCommunication.SetDeviceOutput(pinNumber, state);
+            await _deviceCommunication.SetDeviceOutput(new PinState {PinNumber = pinNumber, State = state });
         }
 
         public async Task GetAllInputStates()
         {
-           await _deviceCommunication.GetAllInputStates();
+            var inputStates = await _deviceCommunication.GetAllInputStates();
+            await _clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllInputStates", inputStates);
+
         }
 
         public async Task GetAllOutputStates()
         {
-           await _deviceCommunication.GetAllOutputStates();
+            var outputStates = await _deviceCommunication.GetAllOutputStates();
+            await _clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);
         }
 
-        public async Task UpdateAllInputStates(List<PinState> inputStates)
-        {
-            await Clients.All.InvokeAsync("UpdateAllInputStates", inputStates);
-        }
+        //public async Task UpdateAllInputStates(List<PinState> inputStates)
+        //{
+        //    await Clients.All.InvokeAsync("UpdateAllInputStates", inputStates);
+        //}
 
-        public async Task UpdateAllOutputStates(List<PinState> outputStates)
-        {
-            await Clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);  // TODO!!!!!
-        }
+        //public async Task UpdateAllOutputStates(List<PinState> outputStates)
+        //{
+        //    await Clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);  // TODO!!!!!
+        //}
 
         public async Task UpdateSingleInputState(PinState pinState)
         {
-           await Clients.All.InvokeAsync("UpdateSingleInputState", pinState);
+            await Clients.All.InvokeAsync("UpdateSingleInputState", pinState);
         }
 
 
         public async Task UpdateSingleOutputState(PinState pinState)
         {
-           await Clients.All.InvokeAsync("UpdateSingleOutputState", pinState);
+            await Clients.All.InvokeAsync("UpdateSingleOutputState", pinState);
         }
 
         public override Task OnConnectedAsync()
@@ -70,7 +73,7 @@ namespace DeviceMonitoring
                 ConnectionCounter.ConnectedIds.Add(Context.ConnectionId);
                 _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Context.Connection.Abort();
             }
@@ -82,7 +85,7 @@ namespace DeviceMonitoring
         public override Task OnDisconnectedAsync(Exception ex)
         {
             _clients = this.Clients;
-           
+
             ConnectionCounter.ConnectedIds.Remove(Context.ConnectionId);
             _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
             return base.OnDisconnectedAsync(ex);

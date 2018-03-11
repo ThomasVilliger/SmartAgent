@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -17,36 +18,19 @@ namespace DeviceMonitoring
             _hub = hub;
         }
 
-        public Task SetDeviceInput(int pinNumber, bool state)
-        {
-            var values = new Dictionary<string, string>
-{
-   { "PinNumber", pinNumber.ToString() },
-   { "State", state.ToString() }
-};
-
-            var content = new FormUrlEncodedContent(values);
+        public Task SetDeviceInput(PinState pinState)
+        {       
             string url = String.Format(@"http://192.168.0.207:8800/api/setDeviceInput/");
-
-            return _client.PostAsync(url, content);
+            return  _client.PutAsync(url, GetHttpStringContent(pinState));        
         }
 
-        public Task SetDeviceOutput(int pinNumber, bool state)
-        {
-            var values = new Dictionary<string, string>
-{
-   { "PinNumber", pinNumber.ToString() },
-   { "State", state.ToString() }
-};
-
-            var content = new FormUrlEncodedContent(values);
-
+        public Task SetDeviceOutput(PinState pinState)
+        {         
             string url = String.Format(@"http://192.168.0.207:8800/api/setDeviceOutput/");
-
-            return _client.PostAsync(url, content);
+            return _client.PutAsync(url, GetHttpStringContent(pinState));
         }
 
-        public async Task GetAllInputStates()
+        public async Task<List<PinState>>  GetAllInputStates()
         {
             string url = String.Format(@"http://192.168.0.207:8800/api/getAllDeviceInputStates");
 
@@ -61,10 +45,10 @@ namespace DeviceMonitoring
                 inputStates.Add(new PinState { PinNumber = i, State = state });
             }
 
-            _hub.UpdateAllInputStates(inputStates);
+            return inputStates;
         }
 
-        public async Task GetAllOutputStates()
+        public async Task<List<PinState>> GetAllOutputStates()
         {
             string url = String.Format(@"http://192.168.0.207:8800/api/getAllDeviceOutputStates");
 
@@ -78,7 +62,14 @@ namespace DeviceMonitoring
                 bool state = Convert.ToBoolean(getResponse.Headers.FirstOrDefault(m => m.Key == i.ToString()).Value.FirstOrDefault());
                 outputStates.Add(new PinState { PinNumber = i, State = state });
             }
-            _hub.UpdateAllOutputStates(outputStates);
+            return outputStates;
+        }
+
+
+        private StringContent GetHttpStringContent(object values)
+        {
+            var jsonContent = JsonConvert.SerializeObject(values);
+            return new StringContent(jsonContent.ToString());
         }
     }
 }

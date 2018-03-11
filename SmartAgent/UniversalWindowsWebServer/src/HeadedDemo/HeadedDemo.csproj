@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{4861BE40-2E8B-41DB-8DFB-AD28686A1DBB}</ProjectGuid>
+    <ProjectGuid>{2002CA56-1D6C-466C-81E5-A14DC67FB371}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Restup.HeadedDemo</RootNamespace>
