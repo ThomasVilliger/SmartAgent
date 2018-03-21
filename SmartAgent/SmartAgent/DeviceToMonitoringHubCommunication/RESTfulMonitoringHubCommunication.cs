@@ -16,24 +16,28 @@ namespace SmartAgent.DeviceGatewayCommunication
 
         public void UpdateSingleInputState(IInput input)
         {
-            var values = new PinState { PinNumber = input.PinNumber, State = input.State };
-            var jsonContent = JsonConvert.SerializeObject(values);
-            var stringContent = new StringContent(jsonContent.ToString());
-            stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-
             string url = String.Format(@"http://192.168.0.13:59162/DeviceMonitoring/UpdateSingleInputState/");
-            _client.PutAsync(url, stringContent);
+            _client.PutAsync(url, GetHttpStringContent(new PinState { PinNumber = input.PinNumber, State = input.State }));
         }
 
         public void UpdateSingleOutputState(IOutput output)
         {
-            var values = new PinState { PinNumber = output.PinNumber, State = output.State };
+            //var values = new PinState { PinNumber = output.PinNumber, State = output.State };
+            //var jsonContent = JsonConvert.SerializeObject(values);
+            //var stringContent = new StringContent(jsonContent.ToString());
+            //stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+
+            string url = String.Format(@"http://192.168.0.13:59162/DeviceMonitoring/UpdateSingleOutputState/");
+            _client.PutAsync(url, GetHttpStringContent(new PinState { PinNumber = output.PinNumber, State = output.State }));
+        }
+
+
+        private StringContent GetHttpStringContent(object values)
+        {
             var jsonContent = JsonConvert.SerializeObject(values);
             var stringContent = new StringContent(jsonContent.ToString());
             stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
-
-            string url = String.Format(@"http://192.168.0.13:59162/DeviceMonitoring/UpdateSingleOutputState/");
-            _client.PutAsync(url, stringContent);
+            return stringContent;
         }
     }
 }

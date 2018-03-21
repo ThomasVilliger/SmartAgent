@@ -20,24 +20,24 @@ namespace DeviceMonitoring
 
         public Task SetDeviceInput(PinState pinState)
         {       
-            string url = String.Format(@"http://192.168.0.207:8800/api/setDeviceInput/");
+            string url = String.Format(@"http://thomas:8800/api/setDeviceInput/");
             return  _client.PutAsync(url, GetHttpStringContent(pinState));        
         }
 
         public Task SetDeviceOutput(PinState pinState)
         {         
-            string url = String.Format(@"http://192.168.0.207:8800/api/setDeviceOutput/");
+            string url = String.Format(@"http://thomas:8800/api/setDeviceOutput/");
             return _client.PutAsync(url, GetHttpStringContent(pinState));
         }
 
         public async Task<List<PinState>>  GetAllInputStates()
         {
-            string url = String.Format(@"http://192.168.0.207:8800/api/getAllDeviceInputStates");
+            string url = String.Format(@"http://thomas:8800/api/getAllDeviceInputStates");
 
             HttpResponseMessage getResponse = await _client.GetAsync(url);
 
             int numberOfInputs = Convert.ToInt32(getResponse.Headers.FirstOrDefault(m => m.Key == "NumberOfInputs").Value.FirstOrDefault());
-            List<PinState> inputStates = new List<PinState>();
+            var inputStates = new List<PinState>();
 
             for (int i = 0; i < numberOfInputs; i++)
             {
@@ -50,12 +50,12 @@ namespace DeviceMonitoring
 
         public async Task<List<PinState>> GetAllOutputStates()
         {
-            string url = String.Format(@"http://192.168.0.207:8800/api/getAllDeviceOutputStates");
+            string url = String.Format(@"http://thomas:8800/api/getAllDeviceOutputStates");
 
             HttpResponseMessage getResponse = await _client.GetAsync(url);
 
             int numberOfOutputs = Convert.ToInt32(getResponse.Headers.FirstOrDefault(m => m.Key == "NumberOfOutputs").Value.FirstOrDefault());
-            List<PinState> outputStates = new List<PinState>();
+            var outputStates = new List<PinState>();
 
             for (int i = 0; i < numberOfOutputs; i++)
             {

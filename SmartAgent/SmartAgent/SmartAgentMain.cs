@@ -25,7 +25,7 @@ namespace SmartAgent
             ChooseDevice();
 
             GatewayHubHandler = new GatewayHubHandler(Device);
-            MonitoringHubHandler = new MonitoringHubHandler(Device);
+            //MonitoringHubHandler = new MonitoringHubHandler(Device);
         }
 
 
