@@ -97,7 +97,7 @@ namespace SPI_GPIO
             writeBuffer3[2] = value;
             try
             {
-                SpiGPIO.Write(writeBuffer3);
+                SpiGPIO?.Write(writeBuffer3);
             }
 
             /* If initialization fails, display the exception and stop running */
@@ -114,7 +114,7 @@ namespace SPI_GPIO
             writeBuffer4[3] = (byte)(value & 0XFF);
             try
             {
-                SpiGPIO.Write(writeBuffer4);
+                SpiGPIO?.Write(writeBuffer4);
             }
 
             /* If initialization fails, display the exception and stop running */
@@ -215,14 +215,14 @@ namespace SPI_GPIO
             writeBuffer4[1] = GPIOA;
             writeBuffer4[2] = 0;
             writeBuffer4[3] = 0;
-            SpiGPIO.TransferFullDuplex(writeBuffer4, readBuffer4);
+            SpiGPIO?.TransferFullDuplex(writeBuffer4, readBuffer4);
             return convertToInt(readBuffer4);                             // Return the constructed word, the format is 0x(register value)
         }
         public static byte ReadRegister8(byte register)
         {        // This function will read a single register, and return it
             writeBuffer3[0] = (BaseAddR | (Address << 1));  // Send the MCP23S17 opcode, chip address, and read bit
             writeBuffer3[1] = register;
-            SpiGPIO.TransferFullDuplex(writeBuffer3, readBuffer3);
+            SpiGPIO?.TransferFullDuplex(writeBuffer3, readBuffer3);
             return readBuffer4[2]; // convertToInt(readBuffer);                             // Return the constructed word, the format is 0x(register value)
         }
         public static UInt16 ReadPin(byte pin)

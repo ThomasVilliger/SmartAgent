@@ -12,8 +12,8 @@ namespace DeviceMonitoring
     {
         private static IHubClients _clients;
         private static Timer _heartbeatWatchdog = new Timer(10000);
-        private static int _connectionCounter;
-        private static bool _isCurrentGateway = true;
+        private static bool _isCurrentGateway = false;
+        private static int _connectedSmartAgentCounter;
 
         public GatewayHub()
         {
@@ -24,7 +24,8 @@ namespace DeviceMonitoring
 
         private static void NoHeartbeat(Object source, ElapsedEventArgs e)
         {
-            _isCurrentGateway = true;
+            _isCurrentGateway = false;
+            _clients.All.InvokeAsync("IsCurrentGateway", _isCurrentGateway);
         }
 
         public async Task PublishActualMachineData(object actualMachineData)
@@ -41,6 +42,7 @@ namespace DeviceMonitoring
 
         public async Task<bool> CheckIfIsCurrentGateway()
         {
+            IncreaseDeviceCounter();
             return _isCurrentGateway;
         }
 
@@ -49,6 +51,7 @@ namespace DeviceMonitoring
             _heartbeatWatchdog.Stop();
             _heartbeatWatchdog.Start();
             _isCurrentGateway = true;
+            _clients.All.InvokeAsync("IsCurrentGateway", _isCurrentGateway);
         }
         public async Task GetAllSmartAgentConnections()
 
@@ -65,22 +68,44 @@ namespace DeviceMonitoring
 
         public override Task OnConnectedAsync()
         {
-            ++_connectionCounter;
-            Console.WriteLine("current Connections on GatewayHub: " + _connectionCounter);
-
             _clients = this.Clients;
 
+            try
+            {
+                _clients.All.InvokeAsync("UpdateDeviceCounter", GatewayDeviceCounter.ConnectedSmartAgents.Count);
+                _clients.All.InvokeAsync("IsCurrentGateway", _isCurrentGateway);
+            }
+            catch (Exception ex)
+            {
+                this.Context.Connection.Abort();
+        }
+ 
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception ex)
         {
-            --_connectionCounter;
-
-            Console.WriteLine("current Connections on GatewayHub: " + _connectionCounter);
-
             _clients = this.Clients;
+            DecreaseDeviceCounter();
             return base.OnDisconnectedAsync(ex);
+        }
+
+        private void DecreaseDeviceCounter()
+        {
+            GatewayDeviceCounter.ConnectedSmartAgents.Remove(Context.ConnectionId);
+            _clients.All.InvokeAsync("UpdateDeviceCounter", GatewayDeviceCounter.ConnectedSmartAgents.Count);
+        }
+
+        private void IncreaseDeviceCounter()
+        {
+            GatewayDeviceCounter.ConnectedSmartAgents.Add(Context.ConnectionId);
+            _clients.All.InvokeAsync("UpdateDeviceCounter", GatewayDeviceCounter.ConnectedSmartAgents.Count);
+        }
+
+
+        public static class GatewayDeviceCounter
+        {
+            public static HashSet<string> ConnectedSmartAgents = new HashSet<string>();
         }
     }
 }

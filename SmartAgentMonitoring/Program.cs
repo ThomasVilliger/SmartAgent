@@ -19,6 +19,7 @@ namespace DeviceMonitoring
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseUrls("http://*:59162")
                 .UseStartup<Startup>()
                 .Build();
     }

@@ -79,22 +79,22 @@ namespace DataAccess
 
                 db.Close();
 
-                //TruncateMachineStateHistoryEntries(150);
+               TruncateMachineStateHistoryEntries(100000);
             }
         }
 
-        private static void TruncateMachineStateHistoryEntries(int days)
+        private static void TruncateMachineStateHistoryEntries(int recordsToKeep)
         {
             using (SqliteConnection db =
     new SqliteConnection("Filename=SmartAgent.db"))
             {
                 db.Open();
 
-                SqliteCommand deleteAllCommand = new SqliteCommand();
-                deleteAllCommand.Connection = db;
+                SqliteCommand truncateCommand = new SqliteCommand();
+                truncateCommand.Connection = db;
 
-                deleteAllCommand.CommandText = "delete from MachineStateHistory where StartDateTime < DATEADD(day, -100, GETDATE())";
-                deleteAllCommand.ExecuteReader();
+                truncateCommand.CommandText = String.Format("delete from MachineStateHistory where rowid < ((select max(rowId) from MachineStateHistory) - {0})", recordsToKeep);
+                truncateCommand.ExecuteReader();
 
                 db.Close();
             }

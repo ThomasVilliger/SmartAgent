@@ -16,7 +16,7 @@ namespace SmartAgent.DeviceGatewayCommunication
 
         public void UpdateSingleInputState(IInput input)
         {
-            string url = String.Format(@"http://192.168.0.13:59162/DeviceMonitoring/UpdateSingleInputState/");
+            string url = String.Format(@"http://localhost:59162/DeviceMonitoring/UpdateSingleInputState/");
             _client.PutAsync(url, GetHttpStringContent(new PinState { PinNumber = input.PinNumber, State = input.State }));
         }
 
@@ -27,7 +27,7 @@ namespace SmartAgent.DeviceGatewayCommunication
             //var stringContent = new StringContent(jsonContent.ToString());
             //stringContent.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
-            string url = String.Format(@"http://192.168.0.13:59162/DeviceMonitoring/UpdateSingleOutputState/");
+            string url = String.Format(@"http://localhost:59162/DeviceMonitoring/UpdateSingleOutputState/");
             _client.PutAsync(url, GetHttpStringContent(new PinState { PinNumber = output.PinNumber, State = output.State }));
         }
 

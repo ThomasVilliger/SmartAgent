@@ -33,14 +33,14 @@ namespace DeviceMonitoring
         public async Task GetAllInputStates()
         {
             var inputStates = await _deviceCommunication.GetAllInputStates();
-            await _clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllInputStates", inputStates);
+            await _clients.Client(ConnectionCounterMonitoring.ConnectedIds.Last()).InvokeAsync("UpdateAllInputStates", inputStates);
 
         }
 
         public async Task GetAllOutputStates()
         {
             var outputStates = await _deviceCommunication.GetAllOutputStates();
-            await _clients.Client(ConnectionCounter.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);
+            await _clients.Client(ConnectionCounterMonitoring.ConnectedIds.Last()).InvokeAsync("UpdateAllOutputStates", outputStates);
         }
 
         //public async Task UpdateAllInputStates(List<PinState> inputStates)
@@ -70,8 +70,8 @@ namespace DeviceMonitoring
 
             try
             {
-                ConnectionCounter.ConnectedIds.Add(Context.ConnectionId);
-                _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
+                ConnectionCounterMonitoring.ConnectedIds.Add(Context.ConnectionId);
+                _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounterMonitoring.ConnectedIds.Count);
             }
             catch (Exception ex)
             {
@@ -86,13 +86,13 @@ namespace DeviceMonitoring
         {
             _clients = this.Clients;
 
-            ConnectionCounter.ConnectedIds.Remove(Context.ConnectionId);
-            _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounter.ConnectedIds.Count);
+            ConnectionCounterMonitoring.ConnectedIds.Remove(Context.ConnectionId);
+            _clients.All.InvokeAsync("UpdateClientCounter", ConnectionCounterMonitoring.ConnectedIds.Count);
             return base.OnDisconnectedAsync(ex);
         }
     }
 
-    public static class ConnectionCounter
+    public static class ConnectionCounterMonitoring
     {
         public static HashSet<string> ConnectedIds = new HashSet<string>();
     }

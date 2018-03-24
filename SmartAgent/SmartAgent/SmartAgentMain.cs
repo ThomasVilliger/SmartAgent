@@ -35,9 +35,9 @@ namespace SmartAgent
             //Device = new PiFaceDevice(new SignalRMonitoringHubCommunication());
             //Device = new PiFaceDevice(new RESTfulMonitoringHubCommunication());
 
-            Device = new DeviceSimulator(new RESTfulMonitoringHubCommunication(), true);
-            //Device = new DeviceSimulator(new SignalRMonitoringHubCommunication(), true);
             //Device = new DeviceSimulator(new RESTfulMonitoringHubCommunication(), false);
+            //Device = new DeviceSimulator(new SignalRMonitoringHubCommunication(), true);
+            Device = new DeviceSimulator(new RESTfulMonitoringHubCommunication(), true);
             //Device = new DeviceSimulator(new SignalRMonitoringHubCommunication(), false);
         }
     }

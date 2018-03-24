@@ -33,10 +33,7 @@ namespace SmartDataHub
             DataAccess.Initialize(optionsBuilder.Options);
 
             services.AddDbContext<SmartDataHubStorageContext>(options =>
-                    options.UseSqlServer(Configuration.GetConnectionString("SmartDataHubContext")));
-
-            
-           
+                    options.UseSqlServer(Configuration.GetConnectionString("SmartDataHubContext")));                
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -20,19 +20,19 @@ namespace DeviceMonitoring
 
         public Task SetDeviceInput(PinState pinState)
         {       
-            string url = String.Format(@"http://thomas:8800/api/setDeviceInput/");
+            string url = String.Format(@"http://127.0.0.1:8800/api/setDeviceInput/");
             return  _client.PutAsync(url, GetHttpStringContent(pinState));        
         }
 
         public Task SetDeviceOutput(PinState pinState)
         {         
-            string url = String.Format(@"http://thomas:8800/api/setDeviceOutput/");
+            string url = String.Format(@"http://127.0.0.1:8800/api/setDeviceOutput/");
             return _client.PutAsync(url, GetHttpStringContent(pinState));
         }
 
         public async Task<List<PinState>>  GetAllInputStates()
         {
-            string url = String.Format(@"http://thomas:8800/api/getAllDeviceInputStates");
+            string url = String.Format(@"http://127.0.0.1:8800/api/getAllDeviceInputStates");
 
             HttpResponseMessage getResponse = await _client.GetAsync(url);
 
@@ -50,7 +50,7 @@ namespace DeviceMonitoring
 
         public async Task<List<PinState>> GetAllOutputStates()
         {
-            string url = String.Format(@"http://thomas:8800/api/getAllDeviceOutputStates");
+            string url = String.Format(@"http://127.0.0.1:8800/api/getAllDeviceOutputStates");
 
             HttpResponseMessage getResponse = await _client.GetAsync(url);
 

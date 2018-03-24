@@ -1,0 +1,45 @@
+﻿
+@{
+//  Layout = null;
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>SmartAgent Gateway</title>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <link href="~/css/deviceMonitoring.css" rel="stylesheet" />
+    <script src="~/lib/signalr-client-1.0.0-alpha2-final.min.js"></script>
+
+</head>
+
+<body>
+
+    <script>
+        $(document).ready(function () {
+
+            let hubConnection = new signalR.HubConnection('/GatewayHub');
+
+            hubConnection.on('UpdateDeviceCounter', function (numberOfConnectedSmartAgents) {
+                $("#clientCounter").text("connected SmartAgents: " + numberOfConnectedSmartAgents);
+            });
+
+
+            hubConnection.on('IsCurrentGateway', function (isCurrentGateway) {
+                $("#isCurrentGateway").text("is current gateway: " + isCurrentGateway);
+            });
+
+            hubConnection.start();
+
+        });
+
+    </script>
+
+    <h1>SmartAgent Gateway</h1>
+
+    <h2 id="isCurrentGateway">is current gateway: </h2>
+    <h2 id="clientCounter">connected SmartAgents: </h2>
+
+ 
+</body>
+</html>
