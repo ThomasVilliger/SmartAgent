@@ -22,36 +22,30 @@ namespace DataAccess
                 db.Open();
 
                 String tableCommand = "CREATE TABLE IF NOT " +
-                    "EXISTS  Machine ( Id INTEGER PRIMARY KEY AUTOINCREMENT, MachineId INTEGER NOT NULL, MachineName TEXT, CycleInputPin INTEGER NOT NULL, MachineStateTimeout INTEGER NOT NULL, PublishingIntervall INTEGER NOT NULL)";
+                "EXISTS  Machine ( Id INTEGER PRIMARY KEY AUTOINCREMENT, MachineId INTEGER NOT NULL, MachineName TEXT, CycleInputPin INTEGER NOT NULL, MachineStateTimeout INTEGER NOT NULL, PublishingIntervall INTEGER NOT NULL)";
                 SqliteCommand createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
-
                 tableCommand = "CREATE TABLE IF NOT " +
-               "EXISTS  InputMonitoring ( Id INTEGER PRIMARY KEY AUTOINCREMENT, InputPin INTEGER NOT NULL, OutputPin INTEGER NOT NULL)";
+                "EXISTS  InputMonitoring ( Id INTEGER PRIMARY KEY AUTOINCREMENT, InputPin INTEGER NOT NULL, OutputPin INTEGER NOT NULL)";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
-
 
                 tableCommand = "CREATE TABLE IF NOT " +
                 "EXISTS  SmartAgentIdentification (SmartAgentId INTEGER NOT NULL)";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
-
                 tableCommand = "CREATE TABLE IF NOT " +
                 "EXISTS  SmartAgent ( Id INTEGER PRIMARY KEY AUTOINCREMENT, Name TEXT NOT NULL , IpAddress TEXT NOT NULL, Priority INTEGER NOT NULL)";
                 createTable = new SqliteCommand(tableCommand, db);
                 createTable.ExecuteReader();
 
-
                 tableCommand = "CREATE TABLE IF NOT " +
-                   "EXISTS   MachineStateHistory ( Id INTEGER PRIMARY KEY AUTOINCREMENT, MachineId INTEGER NOT NULL, MachineState INT NOT NULL, StartDateTime TEXT NOT NULL, EndDateTime TEXT NOT NULL, Duration TEXT NOT NULL, DailyCycleCounter INTEGER NOT NULL, CyclesInThisPeriod INTEGER NOT NULL )";
+                "EXISTS   MachineStateHistory ( Id INTEGER PRIMARY KEY AUTOINCREMENT, MachineId INTEGER NOT NULL, MachineState INT NOT NULL, StartDateTime TEXT NOT NULL, EndDateTime TEXT NOT NULL, Duration TEXT NOT NULL, DailyCycleCounter INTEGER NOT NULL, CyclesInThisPeriod INTEGER NOT NULL )";
 
                 createTable = new SqliteCommand(tableCommand, db);
-
                 createTable.ExecuteReader();
-
                 db.Close();
             }
         }
@@ -79,7 +73,7 @@ namespace DataAccess
 
                 db.Close();
 
-               TruncateMachineStateHistoryEntries(100000);
+                TruncateMachineStateHistoryEntries(100000);
             }
         }
 
@@ -107,22 +101,18 @@ namespace DataAccess
             {
                 db.Open();
 
-
                 SqliteCommand deleteAllCommand = new SqliteCommand();
                 deleteAllCommand.Connection = db;
 
                 deleteAllCommand.CommandText = "delete from SmartAgentIdentification";
                 deleteAllCommand.ExecuteReader();
 
-
                 SqliteCommand insertCommand = new SqliteCommand();
                 insertCommand.Connection = db;
-
 
                 insertCommand.CommandText = "INSERT INTO SmartAgentIdentification VALUES (@SmartAgentId);";
 
                 insertCommand.Parameters.AddWithValue("@SmartAgentId", smartAgentId);
-
 
                 insertCommand.ExecuteReader();
 
@@ -130,25 +120,20 @@ namespace DataAccess
             }
         }
 
-
         public static List<MachineConfiguration> GetMachineConfigurations()
         {
-
             var configs = new List<MachineConfiguration>();
-
 
             using (SqliteConnection db =
     new SqliteConnection("Filename=SmartAgent.db"))
             {
                 db.Open();
 
-
                 SqliteCommand command = new SqliteCommand();
                 command.Connection = db;
 
                 command.CommandText = "select *from Machine";
                 SqliteDataReader reader = command.ExecuteReader();
-
 
                 while (reader.Read())
                 {
@@ -166,8 +151,6 @@ namespace DataAccess
             }
         }
 
-
-
         public static List<MachineStateHistory> GetMachineStateHistoryData(int lastHistoryNumber)
         {
             var historyData = new List<MachineStateHistory>();
@@ -175,18 +158,15 @@ namespace DataAccess
             using (SqliteConnection db =
     new SqliteConnection("Filename=SmartAgent.db"))
             {
-
                 try
                 {
                     db.Open();
-
 
                     SqliteCommand command = new SqliteCommand();
                     command.Connection = db;
 
                     command.CommandText = "select *from MachineStateHistory where id>" + lastHistoryNumber;
                     SqliteDataReader reader = command.ExecuteReader();
-
 
                     while (reader.Read())
                     {
@@ -208,7 +188,6 @@ namespace DataAccess
                     throw ex;
                 }
 
-
                 finally
                 {
                     db.Close();
@@ -226,13 +205,11 @@ namespace DataAccess
             {
                 db.Open();
 
-
                 SqliteCommand command = new SqliteCommand();
                 command.Connection = db;
 
                 command.CommandText = "select *from InputMonitoring";
                 SqliteDataReader reader = command.ExecuteReader();
-
 
                 while (reader.Read())
                 {
@@ -242,32 +219,26 @@ namespace DataAccess
                         OutputPin = Convert.ToInt32(reader["OutputPin"])
 
                     });
-
                 }
                 db.Close();
                 return configs;
             }
         }
 
-
         public static List<SmartAgent> SmartAgents()
         {
-
             var configs = new List<SmartAgent>();
-
 
             using (SqliteConnection db =
     new SqliteConnection("Filename=SmartAgent.db"))
             {
                 db.Open();
 
-
                 SqliteCommand command = new SqliteCommand();
                 command.Connection = db;
 
                 command.CommandText = "select *from SmartAgent";
                 SqliteDataReader reader = command.ExecuteReader();
-
 
                 while (reader.Read())
                 {
@@ -286,7 +257,6 @@ namespace DataAccess
             }
         }
 
-
         public static int GetSmartAgentId()
         {
             int smartAgentId = 0;
@@ -296,13 +266,11 @@ namespace DataAccess
             {
                 db.Open();
 
-
                 SqliteCommand command = new SqliteCommand();
                 command.Connection = db;
 
                 command.CommandText = "select *from SmartAgentIdentification";
                 SqliteDataReader reader = command.ExecuteReader();
-
 
                 while (reader.Read())
                 {
@@ -347,7 +315,6 @@ namespace DataAccess
 
         public static void StoreSmartAgents(List<SmartAgent> smartAgents)
         {
-
             using (SqliteConnection db =
             new SqliteConnection("Filename=SmartAgent.db"))
             {
@@ -359,10 +326,8 @@ namespace DataAccess
                 deleteAllCommand.CommandText = "delete from SmartAgent";
                 deleteAllCommand.ExecuteReader();
 
-
                 foreach (SmartAgent config in smartAgents)
                 {
-
                     SqliteCommand insertCommand = new SqliteCommand();
                     insertCommand.Connection = db;
                     insertCommand.CommandText = "INSERT INTO SmartAgent VALUES (NULL, @Name, @IpAddress, @Priority);";
@@ -377,8 +342,6 @@ namespace DataAccess
                 db.Close();
             }
         }
-
-
 
         public static void StoreInputMonitoringConfigurations(List<InputMonitoringConfiguration> inputMonitoringConfigurations)
         {

@@ -31,7 +31,6 @@ namespace SmartAgent.DeviceGatewayCommunication
             _client.PutAsync(url, GetHttpStringContent(new PinState { PinNumber = output.PinNumber, State = output.State }));
         }
 
-
         private StringContent GetHttpStringContent(object values)
         {
             var jsonContent = JsonConvert.SerializeObject(values);

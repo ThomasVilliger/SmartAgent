@@ -12,6 +12,8 @@ namespace SmartAgentMonitoring.Controllers
         // GET: Gateway
         public ActionResult Index()
         {
+            var hostName = HttpContext.Request.Host.ToString().Split(":");
+            ViewData["DevicePortalWebsite"] = "http://" + hostName[0] + ":8080";
             return View();
         }
     }

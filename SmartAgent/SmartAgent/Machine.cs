@@ -16,7 +16,6 @@ namespace SmartAgent
     // this class processes the machine signal
     public class Machine
     {
-
         public int DailyCycleCounter { get; set; } // TODO Reset at 24:00:00
         public int CyclesInThisPeriod { get; set; }
         public long LastCycleTime { get; set; }
@@ -61,7 +60,6 @@ namespace SmartAgent
             _gatewayHubCommunication.PublishActualMachineData(this);
         }
 
-
         private void CycleTimeOut(ThreadPoolTimer timer)
         {
             if (LastMachineStateInMachineStateHistory != DataAccess.MachineStateHistory.State.Stopped)
@@ -92,14 +90,12 @@ namespace SmartAgent
 
             if (LastMachineStateInMachineStateHistory != DataAccess.MachineStateHistory.State.Running)
             {
-
                 _machineStateStarted = DateTime.Now;
 
                 CurrentMachineState = DataAccess.MachineStateHistory.State.Running;
                 FeedMachineStateHistory();
             }
         }
-
 
         private void CycleTimeOut(object sender, object e)
         {
@@ -111,14 +107,12 @@ namespace SmartAgent
             }
         }
 
-
         private void ResetTimerCycleTimeOut()
         {
             _timerCycleTimeOut.Cancel();
             _timerCycleTimeOut = ThreadPoolTimer.CreatePeriodicTimer(CycleTimeOut,
                                         TimeSpan.FromMilliseconds(MachineConfiguration.MachineStateTimeout));
         }
-
 
         public void StopMachineDataGeneration()
         {
@@ -144,7 +138,6 @@ namespace SmartAgent
                     DataAccess.DataAccess.AddDataMachineStateHistory(lastEntity);
                 }
             }
-
 
             LastMachineStateInMachineStateHistory = CurrentMachineState;
             CyclesInThisPeriod = 0;

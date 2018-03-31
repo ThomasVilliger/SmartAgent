@@ -14,26 +14,30 @@ namespace SmartDataHub
     {
         private static readonly HttpClient _client = new HttpClient();
         private static SmartDataHubStorageContext _dbContext;
+        private static DbContextOptions<SmartDataHubStorageContext> _dbContextOptions;
 
         public static void Initialize(DbContextOptions<SmartDataHubStorageContext> dbContextOptions)
         {
+            _dbContextOptions = dbContextOptions;
             _dbContext = new SmartDataHubStorageContext(dbContextOptions);
         }
 
         internal static List<MachineStateHistory> GetMachineStateHistoryData(int machineId, DateTime fromDate, DateTime toDate)
         {
-            return _dbContext.MachineStateHistory.Where(h => h.MachineId == machineId && (h.StartDateTime >= fromDate && h.EndDateTime <= toDate)).ToList();
+            var context = new SmartDataHubStorageContext(_dbContextOptions);
+            return context.MachineStateHistory.Where(h => h.MachineId == machineId && (h.StartDateTime >= fromDate && h.EndDateTime <= toDate)).ToList();
         }
 
         public static List<Machine> GetMachines(int smartAgentId)
         {
-            return _dbContext.Machine.Where(m => m.SmartAgentId == smartAgentId && m.Active == true).ToList();
+            var context = new SmartDataHubStorageContext(_dbContextOptions);
+            return context.Machine.Where(m => m.SmartAgentId == smartAgentId && m.Active == true).ToList();       
         }
-
 
         public static List<InputMonitoring> GetInputMonitorings(int smartAgentId)
         {
-            return _dbContext.InputMonitoring.Where(m => m.SmartAgentId == smartAgentId).ToList();
+            var context = new SmartDataHubStorageContext(_dbContextOptions);
+            return context.InputMonitoring.Where(m => m.SmartAgentId == smartAgentId).ToList();
         }
 
         // gets all the not imported machine state history data from the SmartAgent and stores it on the database
@@ -50,6 +54,7 @@ namespace SmartDataHub
             if (success)
             {
                 var historyData = new List<MachineStateHistory>();
+ 
                 historyData = JsonConvert.DeserializeObject<List<MachineStateHistory>>(responseMessage);
                 historyData.OrderBy(h => h.SmartAgentHistoryId);
 
@@ -66,7 +71,8 @@ namespace SmartDataHub
 
         public static List<SmartAgent> GetSmartAgents()
         {
-            return _dbContext.SmartAgent.OrderBy(s => s.Priority).ToList();
+            var context = new SmartDataHubStorageContext(_dbContextOptions);
+            return context.SmartAgent.OrderBy(s => s.Priority).ToList();
         }
     }
 }

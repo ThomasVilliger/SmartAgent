@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.System.Threading;
 using DataAccess;
+using System.Threading;
 
 namespace SmartAgent
 {
@@ -64,45 +65,41 @@ namespace SmartAgent
             }
         }
 
-
         private async Task EstablishHubConnection()
         {
             _gatewayHub?.DisposeAsync();
 
-            string url;
-            if (_smartAgents.Any() && !(_smartAgentPriority >= _smartAgents.Count))
+            if (_smartAgents.Any())
             {
-                url = String.Format(@"http://{0}:59162/GatewayHub", _smartAgents[_smartAgentPriority].IpAddress);
+                string url = String.Format(@"http://{0}:59162/GatewayHub", _smartAgents[_smartAgentPriority].IpAddress);
+                _gatewayHub = new HubConnectionBuilder().WithUrl(url).Build();
+
+                _gatewayHub.On<>("ServerOrderedDisconnect",  p => EstablishHubConnection());
+
+                await _gatewayHub.StartAsync().ContinueWith(async task =>
+                {
+                    if (task.IsFaulted || task.IsCanceled)
+                    {
+                        await TryNextGatewayHub();
+                    }
+                    else
+                    {
+                        await _gatewayHub.InvokeAsync<bool>("CheckIfIsCurrentGateway").ContinueWith(async t =>
+                        {
+                            if (t.IsFaulted || t.IsCanceled || !t.Result)
+                            {
+                                await TryNextGatewayHub();
+                            }
+
+                            else
+                            {
+                                _gatewayHub.Closed -= ReEstablishHubConnection;
+                                _gatewayHub.Closed += ReEstablishHubConnection;
+                            }
+                        });
+                    }
+                });
             }
-
-            else
-            {
-                url = String.Format(@"http://localhost:59162/GatewayHub");
-            }
-
-            _gatewayHub = new HubConnectionBuilder().WithUrl(url).Build();
-
-            await _gatewayHub.StartAsync().ContinueWith(async task =>
-           {
-               if (task.IsFaulted || task.IsCanceled)
-               {
-                   await TryNextGatewayHub();
-               }
-               else
-               {
-                   bool isCurrentGateway = await _gatewayHub.InvokeAsync<bool>("CheckIfIsCurrentGateway");
-
-                   if (!isCurrentGateway)
-                   {
-                       await TryNextGatewayHub();
-                   }
-                   else
-                   {
-                       _gatewayHub.Closed -= ReEstablishHubConnection;
-                       _gatewayHub.Closed += ReEstablishHubConnection;
-                   }
-               }
-           });
         }
 
         private async Task ReEstablishHubConnection(Exception ex)
@@ -114,14 +111,12 @@ namespace SmartAgent
         {
             ++_smartAgentPriority;
 
-            if (_smartAgentPriority >= _smartAgents.Count + 1)
+            if (_smartAgentPriority >= _smartAgents.Count)
             {
                 _smartAgentPriority = 0;
             }
             await EstablishHubConnection();
         }
-
-
 
         private void GetAllSmartAgentConnections(bool p)
         {
@@ -139,20 +134,16 @@ namespace SmartAgent
             _gatewayHub?.InvokeAsync("TestSmartAgentConnectionResponse", true);
         }
 
-
         public void InitializeNewMachineConfigurations(List<MachineConfiguration> machinesConfigurations)
         {
             DataAccess.DataAccess.StoreMachinesConfigurations(machinesConfigurations);
         }
-
 
         public void InitializeNewInputMonitoringConfigurations(List<InputMonitoringConfiguration> inputMonitoringConfigurations)
         {
             DataAccess.DataAccess.StoreInputMonitoringConfigurations(inputMonitoringConfigurations);
             LoadSmartAgentConfiguration();
         }
-
-
 
         public void NewHistoryDataNotification()
         {

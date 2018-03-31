@@ -17,16 +17,12 @@ namespace SmartAgent
 
     public static class PiFaceIOcommands
     {
-
         private static DispatcherTimer _timerInputReader;         // create a timer
         private const byte _off = MCP23S17.Off;
         private const byte _on = MCP23S17.On;
         private static PiFaceDevice _piFaceDevice;
         private static UInt16[] _oldInputValues = new UInt16[16];
-
         public static ushort OldInputValues { get; private set; } = 255;
-
-
 
         public static void InitPiFaceIO(PiFaceDevice device)
         {
@@ -53,11 +49,8 @@ namespace SmartAgent
             ReadInputs();
         }
 
-
-
         public static void ReadInputs()
         {
-
             UInt16 value = MCP23S17.ReadRegister16();  // read all the input values
             if (value != OldInputValues)               // if something changed read each input
             {

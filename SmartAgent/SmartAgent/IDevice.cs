@@ -10,7 +10,6 @@ namespace SmartAgent
     // the interface to communicate with the hardware
     public interface IDevice
     {
-
         int NumberOfOutputs { get; }
         int NumberOfInputs { get; }
         string DeviceName { get; }
@@ -19,9 +18,7 @@ namespace SmartAgent
         List<IOutput> Outputs { get; }
         void SetDeviceInput(int pinNumber, bool state);
         void SetDeviceOutput(int pinNumber, bool state);
-
     }
-
 
     public interface IInput
     {
@@ -31,9 +28,7 @@ namespace SmartAgent
         int PinNumber { get; }
     }
 
-
     public interface IOutput
-
     { 
         string Name { get; }
         bool State { get; set; }

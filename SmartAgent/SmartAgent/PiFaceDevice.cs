@@ -8,19 +8,15 @@ using SmartAgent.DeviceGatewayCommunication;
 
 namespace SmartAgent
 {
+    // Implements the device interface to communicate with the PiFace
     public class PiFaceDevice : IDevice
-    {
-        // Implements the device interface to communicate with the PiFace
-
+    {       
         public int NumberOfOutputs { get; } = 8;
         public int NumberOfInputs { get; } = 16;
         public double DeviceVersion { get; } = 2.0;
         public string DeviceName { get; } = "PiFace";
-
         public List<IInput> Inputs { get; } = new List<IInput>();
-
         public List<IOutput> Outputs { get; } = new List<IOutput>();
-
         public IMonitoringHubCommunication GatewayCommunication { get; }
 
         public PiFaceDevice(IMonitoringHubCommunication gatewayCommunication)
@@ -42,7 +38,6 @@ namespace SmartAgent
             InitPiFace();
         }
 
-
         public void SetDeviceInput(int pinNumber, bool state)
         {
             if (pinNumber < NumberOfInputs)
@@ -51,7 +46,6 @@ namespace SmartAgent
             }
         }
 
-
         public void SetDeviceOutput(int pinNumber, bool state)
         {
             if (pinNumber < NumberOfInputs)
@@ -59,7 +53,6 @@ namespace SmartAgent
                 Outputs[pinNumber].State = state;
             }
         }
-
 
         private void InitPiFace()
         {
@@ -113,7 +106,6 @@ namespace SmartAgent
             }
         }
     }
-
     public class PiFaceOutput : IOutput
     {
         private bool _state;

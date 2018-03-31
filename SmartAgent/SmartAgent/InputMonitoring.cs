@@ -35,7 +35,6 @@ namespace SmartAgent
                                       TimeSpan.FromSeconds(15));
         }
 
-
         private void MachineNotAlive(ThreadPoolTimer timer)
         {
             _timerCycleTimeOut1.Cancel();
@@ -48,13 +47,11 @@ namespace SmartAgent
             SetOutput(false);
         }
 
-
         private void InputInterpretation(IInput input)
         {
             SetOutput(true);
             ResetTimerCycleTimeOut();
         }
-
 
         public void ResetTimerCycleTimeOut()
         {
@@ -71,7 +68,6 @@ namespace SmartAgent
         {
             _output.State = outputValue;
         }
-
 
         public void StopInputMonitoring()
         {

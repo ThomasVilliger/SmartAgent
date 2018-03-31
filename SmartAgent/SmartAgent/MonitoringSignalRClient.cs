@@ -15,7 +15,6 @@ namespace SmartAgent
         private static HubConnection _hub;
         private IDevice _device;
 
-
         public MonitoringHubHandler(IDevice device)
         {
             _device = device;
@@ -62,7 +61,6 @@ namespace SmartAgent
             _hub.InvokeAsync("UpdateAllInputStates", inputStates);
         }
 
-
         private void GetAllOutputStates()
         {
             List<PinState> outputStates = new List<PinState>();
@@ -72,8 +70,6 @@ namespace SmartAgent
             }
             _hub.InvokeAsync("UpdateAllOutputStates", outputStates);
         }
-
-
 
         private void SetDeviceInput(PinState pinState)
         {

@@ -23,7 +23,6 @@ namespace SmartAgent.DeviceGatewayCommunication
             EstablishHubConnection();
         }
 
-
         private async Task EstablishHubConnection()
         {          
             string url = @"http://localhost:59162/MonitoringHub";

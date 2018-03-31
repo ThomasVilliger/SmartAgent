@@ -21,7 +21,7 @@
             let hubConnection = new signalR.HubConnection('/GatewayHub');
 
             hubConnection.on('UpdateDeviceCounter', function (numberOfConnectedSmartAgents) {
-                $("#clientCounter").text("connected SmartAgents: " + numberOfConnectedSmartAgents);
+                $("#deviceCounter").text("connected SmartAgents: " + numberOfConnectedSmartAgents);
             });
 
 
@@ -30,15 +30,14 @@
             });
 
             hubConnection.start();
-
         });
-
     </script>
 
     <h1>SmartAgent Gateway</h1>
 
     <h2 id="isCurrentGateway">is current gateway: </h2>
-    <h2 id="clientCounter">connected SmartAgents: </h2>
+    <h2 id="deviceCounter">connected SmartAgents: </h2>
+ 
 
  
 </body>

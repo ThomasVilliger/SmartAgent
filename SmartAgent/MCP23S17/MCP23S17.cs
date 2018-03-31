@@ -11,7 +11,6 @@ namespace SPI_GPIO
 {
     public class MCP23S17
     {
-
         private const byte IODIRA   = 0x00 ;     // I/O Direction Register
         private const byte IODIRB   = 0x01;      // 1 = Input (default), 0 = Output
         private const byte IPOLA    = 0x02 ;     // MCP23x17 Input Polarity Register
@@ -232,9 +231,6 @@ namespace SPI_GPIO
             UInt16 pinmask = (UInt16)(1 << pin);                        // Initialize a variable to hold the read values to be returned
             return ((value & pinmask) > 0) ? Off : On;  // SWITCHED OFF ON !!!!! //  Call the word reading function, extract HIGH/LOW information from the requested pin
         }  
-
-
-   
 
         private static UInt16 convertToInt(byte[] data)
     {

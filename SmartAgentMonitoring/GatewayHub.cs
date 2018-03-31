@@ -25,7 +25,7 @@ namespace DeviceMonitoring
         private static void NoHeartbeat(Object source, ElapsedEventArgs e)
         {
             _isCurrentGateway = false;
-            _clients.All.InvokeAsync("IsCurrentGateway", _isCurrentGateway);
+            _clients.All.InvokeAsync("ServerOrderedDisconnect");
         }
 
         public async Task PublishActualMachineData(object actualMachineData)
@@ -58,7 +58,6 @@ namespace DeviceMonitoring
         {
             await Clients.All.InvokeAsync("GetAllSmartAgentConnections", true);
         }
-
 
         public async Task ReturnSmartAgentConnection(string hostName, string ipAddress)
 
@@ -101,7 +100,6 @@ namespace DeviceMonitoring
             GatewayDeviceCounter.ConnectedSmartAgents.Add(Context.ConnectionId);
             _clients.All.InvokeAsync("UpdateDeviceCounter", GatewayDeviceCounter.ConnectedSmartAgents.Count);
         }
-
 
         public static class GatewayDeviceCounter
         {

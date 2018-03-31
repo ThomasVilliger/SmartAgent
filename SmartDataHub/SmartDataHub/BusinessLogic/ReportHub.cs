@@ -13,7 +13,7 @@ namespace SmartDataHub
             try
             {
                 fromDate = fromDate + TimeSpan.FromHours(1);
-                toDate = toDate + TimeSpan.FromHours(1);
+                toDate = toDate + TimeSpan.FromHours(2);
                 await ReportResponse(machineId, fromDate, toDate);
             }
 

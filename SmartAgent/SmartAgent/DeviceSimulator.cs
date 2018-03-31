@@ -35,7 +35,6 @@ namespace SmartAgent
             }
         }
 
-
         public void SetDeviceInput(int pinNumber, bool state)
         {
             if (pinNumber < NumberOfInputs)
@@ -43,7 +42,6 @@ namespace SmartAgent
                 Inputs[pinNumber].State = state;
             }
         }
-
 
         public void SetDeviceOutput(int pinNumber, bool state)
         {
@@ -53,8 +51,6 @@ namespace SmartAgent
             }
         }
     }
-
-
 
     public class DeviceSimulatorInput : IInput
     {
@@ -77,7 +73,6 @@ namespace SmartAgent
                                    TimeSpan.FromMilliseconds(1000));
             }
         }
-
 
         public bool State
         {

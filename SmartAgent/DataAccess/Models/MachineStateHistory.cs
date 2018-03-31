@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-   public class MachineStateHistory
+    public class MachineStateHistory
     {
-        public enum State {Stopped, Running }
-
+        public enum State { Stopped, Running }
 
         public int SmartAgentHistoryId { get; set; }
         public State MachineState { get; set; }
@@ -32,9 +31,5 @@ namespace DataAccess
         public MachineStateHistory()
         {
         }
-
     }
-
-
-
 }
